@@ -9,17 +9,23 @@ CONFIG += c++2a
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    data.cpp \
+    data_stats.cpp \
     file_reader.cpp \
     header.cpp \
     main.cpp \
-    main_window.cpp
+    main_view.cpp \
+    main_window.cpp \
+    measurement.cpp \
+    plot_drawer.cpp
 
 HEADERS += \
-    data.hpp \
+    data_stats.hpp \
     file_reader.hpp \
     header.hpp \
-    main_window.hpp
+    main_view.hpp \
+    main_window.hpp \
+    measurement.hpp \
+    plot_drawer.hpp
 
 FORMS += \
     main_window.ui

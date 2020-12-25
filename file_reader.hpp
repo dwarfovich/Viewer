@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 
-class Data;
+class Measurement;
 class QFile;
 class QTextStream;
 
@@ -18,7 +18,7 @@ class FileReader : public QObject
     };
 
 public:
-    FileReader(Data& data);
+    FileReader(Measurement& data);
 
     void readFile(const QString& filename);
     bool hasErrors() const;
@@ -43,7 +43,7 @@ private:
     void printHeader() const;
 
 private:
-    Data& data_;
+    Measurement& data_;
     const QChar header_line_starter_ = '#';
     size_t default_data_reserved_size_ = 5'000'000;
 };
