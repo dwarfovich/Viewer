@@ -16,10 +16,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , ui_{new Ui::MainWindow}
     , scene_{new QGraphicsScene {this}}
+    , preview_scene_{new QGraphicsScene {this}}
 {
     ui_->setupUi(this);
     ui_->mainGraphicsView->setScene(scene_);
-    ui_->overallGraphicsView->setScene(scene_);
+    ui_->overallGraphicsView->setScene(preview_scene_);
     ui_->overallGraphicsView->fitInView(scene_->sceneRect());
     ui_->splitter->setSizes({10, 200});
 
@@ -47,9 +48,11 @@ void MainWindow::populateScene()
     scene_->clear();
     PlotDrawer drawer {measurement_, {0., 0., 1920., 1080.}};
     drawer.draw();
-    QGraphicsPixmapItem* item = new QGraphicsPixmapItem {drawer.plot()};
+    auto* item = new QGraphicsPixmapItem {drawer.plot()};
     scene_->addItem(item);
-//    QRect
-    ui_->overallGraphicsView->fitInView(scene_->sceneRect());
+
+    drawer.generatePreview(ui_->overallGraphicsView->width(), ui_->overallGraphicsView->height());
+    item = new QGraphicsPixmapItem {drawer.plot_preview()};
+    ui_->overallGraphicsView->fitInView(preview_scene_->sceneRect());
 }
 

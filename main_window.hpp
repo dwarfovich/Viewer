@@ -27,6 +27,7 @@ private:
 private:
     Ui::MainWindow *ui_;
     QGraphicsScene* scene_;
+    QGraphicsScene* preview_scene_;
     Measurement measurement_;
 };
 #endif // MAINWINDOW_HPP

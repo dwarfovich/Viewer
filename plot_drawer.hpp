@@ -15,12 +15,14 @@ public:
     PlotDrawer(const Measurement& measurement, const QRectF& size);
 
     void draw();
-
-    QPixmap plot() const;
+    void generatePreview(int width, int height);
+    const QPixmap& plot() const;
+    const QPixmap& plot_preview() const;
 
 private:
     const Measurement& measurement_;
     QPixmap plot_;
+    QPixmap plot_preview_;
     QRectF size_;
 };
 
