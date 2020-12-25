@@ -12,7 +12,7 @@ class PlotDrawer: public QObject
     Q_OBJECT
 
 public:
-    PlotDrawer(const Measurement& measurement, const QRectF& size);
+    PlotDrawer(const Measurement& measurement, const QRectF& size = {});
 
     void draw();
     void generatePreview(int width, int height);
@@ -21,6 +21,7 @@ public:
 
 private:
     const Measurement& measurement_;
+    size_t default_rarefraction_ = 500;
     QPixmap plot_;
     QPixmap plot_preview_;
     QRectF size_;

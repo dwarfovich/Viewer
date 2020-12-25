@@ -10,6 +10,8 @@ namespace Ui { class MainWindow; }
 class QGraphicsScene;
 QT_END_NAMESPACE
 
+class PlotWidget;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -28,6 +30,7 @@ private:
     Ui::MainWindow *ui_;
     QGraphicsScene* scene_;
     QGraphicsScene* preview_scene_;
+    PlotWidget* plot_widget_;
     Measurement measurement_;
 };
 #endif // MAINWINDOW_HPP

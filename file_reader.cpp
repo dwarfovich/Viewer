@@ -163,7 +163,7 @@ void FileReader::readData(QTextStream &input)
 
     qreal secs = timer.elapsed() / qreal(1000);
     DEB << "Time: " << secs;
-    DEB << data.size();
+    DEB << "Data size:" << data.size();
 }
 
 qint64 FileReader::estimateMeasurementsCount(QTextStream &input) const

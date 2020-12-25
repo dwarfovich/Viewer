@@ -21,7 +21,21 @@
        <enum>Qt::Vertical</enum>
       </property>
       <widget class="QGraphicsView" name="overallGraphicsView"/>
-      <widget class="MainView" name="mainGraphicsView"/>
+      <widget class="QScrollArea" name="scrollArea">
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>776</width>
+          <height>278</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -57,13 +71,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MainView</class>
-   <extends>QGraphicsView</extends>
-   <header>main_view.hpp</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
