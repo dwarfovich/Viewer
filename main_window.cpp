@@ -53,6 +53,7 @@ void MainWindow::populateScene()
 
     drawer.generatePreview(ui_->overallGraphicsView->width(), ui_->overallGraphicsView->height());
     item = new QGraphicsPixmapItem {drawer.plot_preview()};
+    preview_scene_->addItem(item);
     ui_->overallGraphicsView->fitInView(preview_scene_->sceneRect());
 }
 
