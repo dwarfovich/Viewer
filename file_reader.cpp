@@ -141,11 +141,12 @@ void FileReader::readData(QTextStream &input)
     int first = 0;
     bool is_end = false;
     while (!is_end) {
+        // first value
         int delimiter_pos = d.indexOf(' ', first);
         QStringRef first_value (&d, first, delimiter_pos - first);
         QPointF point;
         point.setY(first_value.toDouble());
-        // second number
+        // second value
         int end_of_line = d.indexOf('\n', delimiter_pos + 1);
         QStringRef second_value (&d, delimiter_pos + 1, end_of_line - delimiter_pos - 1);
         point.setX(second_value.toDouble());
