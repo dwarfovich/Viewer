@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_{new Ui::MainWindow}
     , preview_scene_{new PreviewPlotScene {plot_drawer_, this}}
     , plot_widget_{new PlotWidget {plot_drawer_, this}}
-    , read_progress_dialog_{new QProgressDialog {tr("Loading file"), tr("Cancel"),0,100, this}}
+    , data_read_progress_dialog_{new QProgressDialog {tr("Loading file"), tr("Cancel"),0,100, this}}
 {
     ui_->setupUi(this);
     ui_->previewPlotView->setScene(preview_scene_);
@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&file_reader_, &FileReader::finished,
             this, &MainWindow::onDataReadFinished);
     connect(&file_reader_, &FileReader::progressChanged,
-            read_progress_dialog_, &QProgressDialog::setValue);
+            data_read_progress_dialog_, &QProgressDialog::setValue);
 
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
     connect(ui_->actionQuit, &QAction::triggered, this, &MainWindow::close);
@@ -131,7 +131,7 @@ void MainWindow::onFrameItemChanged(const QRectF &rect)
 
 void MainWindow::onDataReadFinished()
 {
-    read_progress_dialog_->close();
+    data_read_progress_dialog_->close();
     if (!file_reader_.headerErrors().empty() || !file_reader_.dataErrors().empty()) {
         auto reply = showReadingErrorsMessage(file_reader_);
         if (reply != QMessageBox::Yes) {
