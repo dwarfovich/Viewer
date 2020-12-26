@@ -17,19 +17,19 @@ class PlotWidget : public QWidget
 public:
     PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
-    QPixmap plot() const;
     void setPlot(const QPixmap &plot);
-    QSize sizeHint() const override;
-    void drawArea(int first_point, int last_point, int height);
+    void drawArea(int first_point, int last_point);
+
+signals:
+    void scaleChangeRequest(qreal angle_delta);
 
 protected:
+    void wheelEvent(QWheelEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
 private:
     PlotDrawer& drawer_;
     QPixmap plot_;
-//    const Measurement& m_;
-    qreal x_scale = 1.0;
 };
 
 #endif // PLOTWIDGET_HPP

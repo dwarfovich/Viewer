@@ -3,6 +3,7 @@
 #include "preview_plot_frame_item.hpp"
 
 #include <QGraphicsPixmapItem>
+#include <QGraphicsSceneWheelEvent>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -29,4 +30,22 @@ void PreviewPlotScene::updatePreview(int width, int height)
     drawer_.generatePreview(width, height);
     preview_item_->setPixmap(drawer_.plotPreview());
     update();
+}
+
+void PreviewPlotScene::onPlotScaleRequest(qreal angle_data)
+{
+    qreal new_scale = 0.;
+    if (angle_data > 0.) {
+        new_scale = std::min(x_scale + scale_delta, max_scale);
+    } else {
+        new_scale = std::max(x_scale - scale_delta, min_scale);
+    }
+
+    qreal default_width = 500;
+    qreal width = frame_item_->width();
+    width = default_width * new_scale;
+    frame_item_->setWidth(width);
+    x_scale = new_scale;
+    update();
+    emit frameItemChanged(frame_item_->boundingRect());
 }

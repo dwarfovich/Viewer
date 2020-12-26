@@ -31,6 +31,7 @@ private:
 
 private slots:
     void onPreviewViewSizeChanged(const QSize& size);
+    void onFrameItemChanged(const QRectF& rect);
 
 private:
     Measurement measurement_;

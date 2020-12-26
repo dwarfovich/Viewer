@@ -39,3 +39,10 @@ void PreviewPlotView::resizeEvent(QResizeEvent *event)
 {
     emit sizeChanged(event->size());
 }
+
+void PreviewPlotView::wheelEvent(QWheelEvent *event)
+{
+    emit scaleChangeRequest(event->angleDelta().y());
+
+    event->accept();
+}
