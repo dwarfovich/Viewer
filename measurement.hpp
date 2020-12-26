@@ -10,8 +10,6 @@
 
 struct Measurement
 {
-    friend class FileReader;
-
     Header header;
     std::vector<QPointF> data;
     DataStats stats;
