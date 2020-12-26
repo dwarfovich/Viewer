@@ -28,6 +28,8 @@ public slots:
 
 private:
     void updatePlot();
+    int showReadingErrorsMessage(const FileReader& reader) const;
+
 
 private slots:
     void onPreviewViewSizeChanged(const QSize& size);

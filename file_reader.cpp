@@ -11,24 +11,23 @@
 #include <QDebug>
 #define DEB qDebug()
 
-FileReader::FileReader(Measurement &data)
-    : data_{data}
+FileReader::FileReader()
 {}
 
 void FileReader::readFile(const QString &filename)
 {
     QFile file {filename};
-
     if (file.open(QFile::ReadOnly)) {
-        clearData();
+        clearMeasurement();
         QTextStream input {&file};
-        auto result = readHeader(input);
+        auto header_lines = readHeaderLines(input);
+        const auto& header_errors = parseHeaderLines(header_lines);
+        header_errors_.append(header_errors);
+//        printHeader();
         readData(input);
         emit finished();
     } else {
-        static const QString caption = QObject::tr("Critical error");
-        static const QString text = QObject::tr("Cannot open file");
-        QMessageBox::critical(nullptr, caption, text);
+        data_errors_.push_back(tr("Cannot open file"));
     }
 }
 
@@ -37,128 +36,123 @@ bool FileReader::hasErrors() const
     return false;
 }
 
-bool FileReader::readHeader(QTextStream &input)
+QStringList FileReader::readHeaderLines(QTextStream &input) const
 {
-    auto pos = input.pos();
-    QChar starter;
-    input >> starter;
-    if (starter == header_line_starter_) {
-        QString line = input.readLine();
-        bool result = readOrganiationAndApp(line);
-        if (!result) {
-            return false;
-        }
-        line = input.readLine();
-        result = readMeasurementType(line);
-        if (!result) {
-            return false;
-        }
-        line = input.readLine();
-        result = readStartTime(line);
-        if (!result) {
-            return false;
-        }
-        result = readParameters(input);
-    } else {
-        input.seek(pos);
-    }
-
-//    printHeader();
-
-//    return istream;
-    return true;
-}
-
-bool FileReader::checkHeaderLineStarter(const QString &line) const
-{
-    return line.front() == header_line_starter_;
-}
-
-bool FileReader::readOrganiationAndApp(QString line)
-{
-    const auto& parts = line.split(",");
-    const int expected_lines = 2;
-    if (parts.size() == expected_lines) {
-        data_.header.organization_ = parts[OrganizationAndAppParts::OrganizationPart].simplified();
-        data_.header.application_ = parts[OrganizationAndAppParts::ApplicationPart].simplified();
-        return true;
-    } else {
-        static const QString caption = QObject::tr("Warning");
-        static const QString text = QObject::tr("Cannot parse organization and application. Proceed anyway?");
-        auto reply = QMessageBox::warning(nullptr, caption, text, QMessageBox::Yes|QMessageBox::No);
-        if (reply == QMessageBox::Yes) {
-            data_.header.organization_ = line.simplified();
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
-
-bool FileReader::readMeasurementType(QString line)
-{
-    bool result = checkHeaderLineStarter(line);
-    line.remove(0, 1);
-    data_.header.measurement_type_ = line.simplified();
-
-    return true;
-}
-
-bool FileReader::readStartTime(QString line)
-{
-    line.remove(0, 2);
-    static const QString time_format = "ddd MMM dd hh:mm:ss yyyy";
-    static const QLocale locale {"en_US"};
-    data_.header.start_time_ = locale.toDateTime(line, time_format);
-
-    return true;
-}
-
-bool FileReader::readParameters(QTextStream &input)
-{
-    bool is_parameters_line = true;
-    while (is_parameters_line) {
+    QStringList lines;
+    while (true) {
         auto pos = input.pos();
         QString line = input.readLine();
-        if (checkHeaderLineStarter(line)) {
-            line.remove(0, 1);
-            data_.header.parameters_.push_back(line.simplified());
+        if (isHeaderLine(line)) {
+            lines.push_back(line.remove(0, 1).simplified()); // Remove first '#' symbol
         } else {
             input.seek(pos);
-            is_parameters_line = false;
+            break;
         }
     }
 
-    return true;
+    return lines;
+}
+
+QStringList FileReader::parseHeaderLines(const QStringList &lines)
+{
+    if (lines.size() > HeaderLines::OrganizationAndApp) {
+        parseOrganiationAndApp(lines[HeaderLines::OrganizationAndApp]);
+    }
+    if (lines.size() > HeaderLines::MeasurementType) {
+        parseMeasurementType(lines[HeaderLines::MeasurementType]);
+    }
+    if (lines.size() > HeaderLines::StartTime) {
+        parseStartTime(lines[HeaderLines::StartTime]);
+    }
+    if (lines.size() > HeaderLines::Duration) {
+        parseDuration(lines[HeaderLines::Duration]);
+    }
+    if (lines.size() > HeaderLines::Parameters) {
+        parseParameters(lines, HeaderLines::Parameters);
+    }
+
+    if (lines.size() < HeaderLines::Parameters + 1) {
+        return {tr("One or more header lines are missing")};
+    } else {
+        return {};
+    }
+}
+
+bool FileReader::isHeaderLine(const QString &line) const
+{
+    return (line.front() == header_line_starter_);
+}
+
+void FileReader::parseOrganiationAndApp(QString line)
+{
+    int organization_delimiter_pos = line.indexOf(',');
+    if (organization_delimiter_pos == -1){
+        measurement_.header.organization = line;
+    } else {
+        measurement_.header.organization = line.left(organization_delimiter_pos);
+        measurement_.header.application =
+                line.right(line.size() - organization_delimiter_pos - 1).simplified();
+    }
+}
+
+void FileReader::parseMeasurementType(QString line)
+{
+    measurement_.header.measurement_type = line.simplified();
+}
+
+void FileReader::parseStartTime(QString line)
+{
+    static const QString time_format = "ddd MMM dd hh:mm:ss yyyy";
+    static const QLocale locale {"en_US"};
+    auto time = locale.toDateTime(line, time_format);
+    if (!time.isValid()) {
+        header_errors_.push_back(tr("Cannot parse start time."));
+    } else{
+        measurement_.header.start_time = locale.toDateTime(line, time_format);
+    }
+}
+
+void FileReader::parseDuration(QString line)
+{
+    measurement_.header.duration = line;
+}
+
+void FileReader::parseParameters(const QStringList &header_lines, int first_parameters_line)
+{
+    std::vector<QString> parameters;
+    for (size_t i = first_parameters_line; i < header_lines.size(); ++i) {
+        parameters.push_back(header_lines[i]);
+    }
+    measurement_.header.parameters = parameters;
 }
 
 void FileReader::readData(QTextStream &input)
 {
     QTime timer;
-    auto& data = data_.data;
+    auto& data = measurement_.data;
     timer.start();
-    data.reserve(default_data_reserved_size());
-    QString d = input.readAll();
+    data.reserve(dataReservedSize());
+    QString text = input.readAll();
     qreal secs = timer.elapsed() / qreal(1000);
     DEB << "Reading data:" << secs;
     int first = 0;
-    while (first < d.size() - 1) {
+    while (first < text.size() - 1) {
         // first value
-        int delimiter_pos = d.indexOf(' ', first);
-        QStringRef first_value (&d, first, delimiter_pos - first);
+        int delimiter_pos = text.indexOf(' ', first);
+        QStringRef first_value (&text, first, delimiter_pos - first);
         // second value
-        int end_of_line = d.indexOf('\n', delimiter_pos + 1);
-        QStringRef second_value (&d, delimiter_pos + 1, end_of_line - delimiter_pos - 1);
+        int end_of_line = text.indexOf('\n', delimiter_pos + 1);
+        QStringRef second_value (&text, delimiter_pos + 1, end_of_line - delimiter_pos - 1);
 
         QPointF point;
         point.setX(first_value.toDouble());
         point.setY(second_value.toDouble());
         data.push_back(point);
 
-        data_.stats.min_x = std::min(data_.stats.min_x, point.x());
-        data_.stats.max_x = std::max(data_.stats.max_x, point.x());
-        data_.stats.min_y = std::min(data_.stats.min_y, point.y());
-        data_.stats.max_y = std::max(data_.stats.max_y, point.y());
+        measurement_.stats.min_x = std::min(measurement_.stats.min_x, point.x());
+        measurement_.stats.max_x = std::max(measurement_.stats.max_x, point.x());
+        measurement_.stats.min_y = std::min(measurement_.stats.min_y, point.y());
+        measurement_.stats.max_y = std::max(measurement_.stats.max_y, point.y());
 
         first = end_of_line + 1;
     }
@@ -166,38 +160,53 @@ void FileReader::readData(QTextStream &input)
     secs = timer.elapsed() / qreal(1000);
     DEB << "Parsing time: " << secs;
     DEB << "Data size:" << data.size();
+
+    measurement_.header.data_size = data.size();
 }
 
-qint64 FileReader::estimateMeasurementsCount(QTextStream &input) const
+void FileReader::clearMeasurement()
 {
-    auto start = input.pos();
-    return {};
-}
-
-void FileReader::clearData()
-{
-    data_.data.clear();
-    data_.header.parameters_.clear();
+    measurement_.data.clear();
+    measurement_.header.parameters.clear();
+    measurement_.stats.min_x = std::numeric_limits<double>::max();
+    measurement_.stats.max_x = 0.;
+    measurement_.stats.min_y = std::numeric_limits<double>::max();
+    measurement_.stats.max_y = 0.;
 }
 
 void FileReader::printHeader() const
 {
-    const auto& header = data_.header;
-    DEB << "Organization:" << header.organization_;
-    DEB << "Application:" << header.application_;
-    DEB << "Measurement type:" << header.measurement_type_;
-    DEB << "Start time:" << header.start_time_;
-    for (const auto& str : header.parameters_) {
+    const auto& header = measurement_.header;
+    DEB << "Organization:" << header.organization;
+    DEB << "Application:" << header.application;
+    DEB << "Measurement type:" << header.measurement_type;
+    DEB << "Start time:" << header.start_time;
+    for (const auto& str : header.parameters) {
         DEB << str;
     }
 }
 
-size_t FileReader::default_data_reserved_size() const
+const QStringList &FileReader::dataErrors() const
 {
-    return default_data_reserved_size_;
+    return data_errors_;
 }
 
-void FileReader::setDefault_data_reserved_size(const size_t &default_data_reserved_size)
+const QStringList &FileReader::headerErrors() const
 {
-    default_data_reserved_size_ = default_data_reserved_size;
+    return header_errors_;
+}
+
+size_t FileReader::dataReservedSize() const
+{
+    return data_reserved_size_;
+}
+
+void FileReader::setDataReservedSize(const size_t &size)
+{
+    data_reserved_size_ = size;
+}
+
+Measurement FileReader::takeMeasurement()
+{
+    return std::move(measurement_);
 }

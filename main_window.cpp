@@ -13,6 +13,7 @@
 #include <QGraphicsPixmapItem>
 #include <QScrollBar>
 #include <QTimer>
+#include <QMessageBox>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -59,8 +60,15 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
-    FileReader reader {measurement_};
+    FileReader reader {};
     reader.readFile(filename);
+    if (!reader.headerErrors().empty() || !reader.dataErrors().empty()) {
+        auto reply = showReadingErrorsMessage(reader);
+        if (reply != QMessageBox::Yes) {
+            return;
+        }
+    }
+    measurement_ = reader.takeMeasurement();
     updatePlot();
 }
 
@@ -91,6 +99,29 @@ void MainWindow::updatePlot()
     int plot_area_height = plot_widget_->height();
     plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
     plot_widget_->drawArea(first, last);
+}
+
+int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
+{
+    QString caption = tr("Warning");
+    QString text;
+    if (!reader.headerErrors().empty()){
+        text.append(tr("There are following header errors:\n"));
+        for (const auto& error : reader.headerErrors()) {
+            text.append(error + '\n');
+        }
+    }
+    if (!reader.dataErrors().empty()) {
+        text.append(tr("There are following data errors:\n"));
+        for (const auto& error : reader.dataErrors()) {
+            text.append(error + '\n');
+        }
+    }
+
+    text.append(tr("Proceed anyway?"));
+
+    int reply = QMessageBox::question(nullptr, caption, text);
+    return reply;
 }
 
 void MainWindow::onPreviewViewSizeChanged(const QSize &size)

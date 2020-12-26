@@ -1,6 +1,8 @@
 #ifndef FILEREADER_HPP
 #define FILEREADER_HPP
 
+#include <measurement.hpp>
+
 #include <QObject>
 #include <QString>
 
@@ -12,40 +14,54 @@ class FileReader : public QObject
 {
     Q_OBJECT
 
+    enum HeaderLines {
+        OrganizationAndApp = 0,
+        MeasurementType,
+        StartTime,
+        Duration,
+        Parameters
+    };
+
     enum OrganizationAndAppParts {
         OrganizationPart = 0,
         ApplicationPart
     };
 
 public:
-    FileReader(Measurement& data);
+    FileReader();
 
     void readFile(const QString& filename);
     bool hasErrors() const;
 
-    size_t default_data_reserved_size() const;
-    void setDefault_data_reserved_size(const size_t &default_data_reserved_size);
+    size_t dataReservedSize() const;
+    void setDataReservedSize(const size_t &size);
+    Measurement takeMeasurement();
+    const QStringList& headerErrors() const;
+    const QStringList& dataErrors() const;
 
 signals:
     void finished();
 
 private:
-    bool readHeader(QTextStream &input);
-    bool checkHeaderLineStarter(const QString& line) const;
-    bool readOrganiationAndApp(QString line);
-    bool readMeasurementType(QString line);
-    bool readStartTime(QString line);
-    bool readParameters(QTextStream& input);
+    QStringList readHeaderLines(QTextStream& input) const;
+    QStringList parseHeaderLines(const QStringList& lines);
+    bool isHeaderLine(const QString& line) const;
+    void parseOrganiationAndApp(QString line);
+    void parseMeasurementType(QString line);
+    void parseStartTime(QString line);
+    void parseDuration(QString line);
+    void parseParameters(const QStringList& header_lines, int first_parameters_line);
     void readData(QTextStream& input);
-    qint64 estimateMeasurementsCount(QTextStream& input) const;
-    void clearData();
+    void clearMeasurement();
 
     void printHeader() const;
 
 private:
-    Measurement& data_;
+    Measurement measurement_;
     const QChar header_line_starter_ = '#';
-    size_t default_data_reserved_size_ = 5'000'000;
+    size_t data_reserved_size_ = 5'000'000;
+    QStringList header_errors_;
+    QStringList data_errors_;
 };
 
 #endif // FILEREADER_HPP

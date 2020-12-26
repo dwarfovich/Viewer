@@ -8,16 +8,13 @@ class QTextStream;
 
 struct Header
 {
-public:
-    Header();
-
-    friend QTextStream &operator>> (QTextStream& is, Header& header);
-
-    QString organization_;
-    QString application_;
-    QString measurement_type_;
-    QDateTime start_time_;
-    std::vector<QString> parameters_;
+    QString organization;
+    QString application;
+    QString measurement_type;
+    QDateTime start_time;
+    QString duration;
+    std::vector<QString> parameters;
+    size_t data_size;
 };
 
 #endif // HEADER_HPP
