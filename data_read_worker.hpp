@@ -25,6 +25,7 @@ private:
     std::vector<QPointF> data_;
     DataStats stats_;
     size_t reserved_data_size_ = 5'000'000;
+    const int steps_per_progress_ = 100'000;
 };
 
 #endif // DATAREADWORKER_HPP

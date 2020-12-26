@@ -13,7 +13,6 @@ void DataReadWorker::read(const QString &text)
     QTime timer;
     timer.start();
     data_.reserve(reserved_data_size_);
-    const int progress_steps = 100000;
     int progress_step = 0;
     for (int first = 0; first < text.size() - 1;) {
         // first value
@@ -34,8 +33,7 @@ void DataReadWorker::read(const QString &text)
         stats_.max_y = std::max(stats_.max_y, point.y());
 
         ++progress_step;
-        if (progress_step == progress_steps) {
-            DEB << "Progress" << first * 100. / (text.size() - 1);
+        if (progress_step == steps_per_progress_) {
             progress_step = 0;
             emit progressChanged(first * 100. / (text.size() - 1));
         }
