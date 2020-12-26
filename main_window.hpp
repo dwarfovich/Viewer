@@ -11,6 +11,7 @@ class QGraphicsScene;
 QT_END_NAMESPACE
 
 class PlotWidget;
+class PreviewPlotFrameItem;
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +23,7 @@ public:
 
 public slots:
     void loadFile();
+    void onPreviewFrameItemPosChanged(const QPointF& new_pos);
 
 private:
     void populateScene();
@@ -31,6 +33,7 @@ private:
     QGraphicsScene* scene_;
     QGraphicsScene* preview_scene_;
     PlotWidget* plot_widget_;
+    PreviewPlotFrameItem* frame_item_;
     Measurement measurement_;
 };
 #endif // MAINWINDOW_HPP

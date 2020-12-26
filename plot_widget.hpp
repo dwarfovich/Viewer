@@ -19,6 +19,8 @@ public:
 
     QPixmap plot() const;
     void setPlot(const QPixmap &plot);
+    QSize sizeHint() const override;
+    void drawArea(int first_point, int last_point, int height);
 
 protected:
     void paintEvent(QPaintEvent *event) override;
@@ -28,10 +30,6 @@ private:
     PlotDrawer drawer_;
     const Measurement& m_;
     qreal x_scale = 1.0;
-
-    // QWidget interface
-public:
-    QSize sizeHint() const override;
 };
 
 #endif // PLOTWIDGET_HPP

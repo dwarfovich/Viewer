@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 
-class Measurement;
+struct Measurement;
 class QFile;
 class QTextStream;
 

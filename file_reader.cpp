@@ -139,6 +139,8 @@ void FileReader::readData(QTextStream &input)
     timer.start();
     data.reserve(default_data_reserved_size());
     QString d = input.readAll();
+    qreal secs = timer.elapsed() / qreal(1000);
+    DEB << "Reading data:" << secs;
     int first = 0;
     while (first < d.size() - 1) {
         // first value
@@ -161,8 +163,8 @@ void FileReader::readData(QTextStream &input)
         first = end_of_line + 1;
     }
 
-    qreal secs = timer.elapsed() / qreal(1000);
-    DEB << "Time: " << secs;
+    secs = timer.elapsed() / qreal(1000);
+    DEB << "Parsing time: " << secs;
     DEB << "Data size:" << data.size();
 }
 

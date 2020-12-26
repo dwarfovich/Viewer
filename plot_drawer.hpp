@@ -14,8 +14,9 @@ class PlotDrawer: public QObject
 public:
     PlotDrawer(const Measurement& measurement, const QRectF& size = {});
 
-    void draw();
+    void draw(size_t first, size_t last, int width, int height);
     void generatePreview(int width, int height);
+    void generatePlotArea(int first, int last, int width, int height);
     const QPixmap& plot() const;
     const QPixmap& plot_preview() const;
 

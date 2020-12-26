@@ -12,7 +12,7 @@ PlotDrawer::PlotDrawer(const Measurement &measurement, const QRectF &size)
     , size_({size})
 {}
 
-void PlotDrawer::draw()
+void PlotDrawer::draw(size_t first, size_t last, int width, int height)
 {
     const auto& data = measurement_.data;
     const auto& stats = measurement_.stats;
@@ -46,7 +46,6 @@ void PlotDrawer::draw()
 
 void PlotDrawer::generatePreview(int width, int height)
 {
-//    plot_preview_ = plot_.scaled(width, height);
     const auto& data = measurement_.data;
     const auto& stats = measurement_.stats;
 
@@ -76,6 +75,44 @@ void PlotDrawer::generatePreview(int width, int height)
     }
 
     painter.drawRect(0, 0, width, height);
+}
+
+void PlotDrawer::generatePlotArea(int first, int last, int width, int height)
+{
+    const auto& data = measurement_.data;
+    const auto& stats = measurement_.stats;
+
+    int first_point = (data.size() * first) / 100;
+    if (first_point == 0) {
+        ++first_point;
+    }
+    int last_point = (data.size() * last) / 100;
+    if (last_point >= data.size()) {
+        last_point = data.size() - 1;
+    }
+    plot_ = QPixmap{width, height};
+    QPainter painter {&plot_};
+    plot_.fill(Qt::black);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPen pen {Qt::green};
+    painter.setPen(pen);
+
+    auto min_max_y = std::minmax_element(data.begin() + first_point, data.begin() + last_point,
+                                         [](const QPointF p1, const QPointF& p2){ return p1.y() < p2.y();});
+    qreal delta_x = stats.max_x - stats.min_x;
+    qreal delta_y = stats.max_y - stats.min_y;
+    delta_x = data[last_point].x() - data[first_point].x();
+    delta_y = min_max_y.second->y() - min_max_y.first->y();
+    for (size_t i = first_point; i <= last_point; i += 1) {
+        QPointF point1;
+        point1.setX(width  * (data[i - 1].x() - data[first_point].x()) / delta_x);
+        point1.setY(height * (data[i - 1].y() - min_max_y.first->y()) / delta_y);
+        QPointF point2;
+//         TODO: Инвертировать значения по y
+        point2.setX(width  * (data[i].x() - data[first_point].x()) / delta_x);
+        point2.setY(height * (data[i].y() - min_max_y.first->y()) / delta_y);
+        painter.drawLine(point1, point2);
+    }
 }
 
 const QPixmap &PlotDrawer::plot() const

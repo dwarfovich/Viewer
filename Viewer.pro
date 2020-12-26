@@ -17,7 +17,9 @@ SOURCES += \
     main_window.cpp \
     measurement.cpp \
     plot_drawer.cpp \
-    plot_widget.cpp
+    plot_widget.cpp \
+    preview_plot_frame_item.cpp \
+    preview_plot_view.cpp
 
 HEADERS += \
     data_stats.hpp \
@@ -27,7 +29,9 @@ HEADERS += \
     main_window.hpp \
     measurement.hpp \
     plot_drawer.hpp \
-    plot_widget.hpp
+    plot_widget.hpp \
+    preview_plot_frame_item.hpp \
+    preview_plot_view.hpp
 
 FORMS += \
     main_window.ui

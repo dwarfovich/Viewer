@@ -20,7 +20,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QGraphicsView" name="overallGraphicsView"/>
+      <widget class="PreviewPlotView" name="previewPlotView"/>
       <widget class="QScrollArea" name="scrollArea">
        <property name="widgetResizable">
         <bool>true</bool>
@@ -71,6 +71,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PreviewPlotView</class>
+   <extends>QGraphicsView</extends>
+   <header>preview_plot_view.hpp</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
