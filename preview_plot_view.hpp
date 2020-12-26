@@ -20,7 +20,6 @@ protected:
 
 private:
     QPointF click_location_ = {};
-    QPointF scene_center_ = {};
     bool is_scrolling_ = false;
 };
 

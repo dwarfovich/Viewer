@@ -26,14 +26,13 @@ public slots:
     void onPreviewFrameItemPosChanged(const QPointF& new_pos);
 
 private:
-    void populateScene();
+    void updatePlot();
 
 private:
+    Measurement measurement_;
     Ui::MainWindow *ui_;
-    QGraphicsScene* scene_;
     QGraphicsScene* preview_scene_;
     PlotWidget* plot_widget_;
     PreviewPlotFrameItem* frame_item_;
-    Measurement measurement_;
 };
 #endif // MAINWINDOW_HPP

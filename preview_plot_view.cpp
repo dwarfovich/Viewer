@@ -14,8 +14,6 @@ void PreviewPlotView::mousePressEvent(QMouseEvent *event)
     if (event->button() == Qt::LeftButton) {
         is_scrolling_ = true;
         click_location_ = event->pos();
-        scene_center_ = mapToScene(viewport()->rect().center());
-//        DEB << "Click location" << click_location_;
     }
     QGraphicsView::mousePressEvent(event);
 }
@@ -23,11 +21,7 @@ void PreviewPlotView::mousePressEvent(QMouseEvent *event)
 void PreviewPlotView::mouseMoveEvent(QMouseEvent *event)
 {
     if (is_scrolling_) {
-//        centerOn(scene_center_ - event->pos() + click_location_);
-        auto new_pos = scene_center_ - event->pos() + click_location_;
-        new_pos = event->pos() - click_location_;
-//        click_location_ = new_pos;
-        emit frameItemPosChanged(new_pos);
+        emit frameItemPosChanged(event->pos() - click_location_);
     }
     QGraphicsView::mouseMoveEvent(event);
 }

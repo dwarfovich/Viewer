@@ -19,16 +19,13 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , ui_{new Ui::MainWindow}
-    , scene_{new QGraphicsScene {this}}
     , preview_scene_{new QGraphicsScene {this}}
     , plot_widget_{new PlotWidget {measurement_, this}}
 {
     ui_->setupUi(this);
-//    ui_->mainGraphicsView->setScene(scene_);
     ui_->previewPlotView->setScene(preview_scene_);
     ui_->previewPlotView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui_->previewPlotView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-//    ui_->overallGraphicsView->fitInView(scene_->sceneRect());
     ui_->splitter->setSizes({10, 200});
     ui_->scrollArea->setWidget(plot_widget_);
 
@@ -53,7 +50,7 @@ void MainWindow::loadFile()
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
     FileReader reader {measurement_};
     reader.readFile(filename);
-    populateScene();
+    updatePlot();
 }
 
 void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
@@ -77,17 +74,15 @@ void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
     plot_widget_->drawArea(first, last, plot_height);
 }
 
-void MainWindow::populateScene()
+void MainWindow::updatePlot()
 {
-    scene_->clear();
-    PlotDrawer drawer {measurement_, {0., 0., 1920., 1080.}};
+    PlotDrawer drawer {&measurement_};
     QTime timer;
     timer.start();
-    DEB << ui_->previewPlotView->geometry().width() << ui_->previewPlotView->geometry().height();
     drawer.generatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
     qreal secs = timer.elapsed() / qreal(1000);
     DEB << "Preview painting time: " << secs;
-    auto* item = new QGraphicsPixmapItem {drawer.plot_preview()};
+    auto* item = new QGraphicsPixmapItem {drawer.plotPreview()};
     item->setZValue(1);
     preview_scene_->addItem(item);
     plot_widget_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
