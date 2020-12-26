@@ -7,10 +7,9 @@
 #include "preview_plot_frame_item.hpp"
 #include "preview_plot_scene.hpp"
 
-#include <QGraphicsScene>
+#include <QProgressDialog>
 #include <QAction>
 #include <QFileDialog>
-#include <QGraphicsPixmapItem>
 #include <QScrollBar>
 #include <QTimer>
 #include <QMessageBox>
@@ -23,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_{new Ui::MainWindow}
     , preview_scene_{new PreviewPlotScene {plot_drawer_, this}}
     , plot_widget_{new PlotWidget {plot_drawer_, this}}
+    , read_progress_dialog_{new QProgressDialog {tr("Loading file"), tr("Cancel"),0,100, this}}
 {
     ui_->setupUi(this);
     ui_->previewPlotView->setScene(preview_scene_);
@@ -43,7 +43,10 @@ MainWindow::MainWindow(QWidget *parent)
             preview_scene_, &PreviewPlotScene::onPlotScaleRequest);
     connect(preview_scene_, &PreviewPlotScene::frameItemChanged,
             this, &MainWindow::onFrameItemChanged);
-    connect(&file_reader_, &FileReader::finished, this, &MainWindow::onDataReadFinished);
+    connect(&file_reader_, &FileReader::finished,
+            this, &MainWindow::onDataReadFinished);
+    connect(&file_reader_, &FileReader::progressChanged,
+            read_progress_dialog_, &QProgressDialog::setValue);
 
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
     connect(ui_->actionQuit, &QAction::triggered, this, &MainWindow::close);
@@ -61,16 +64,7 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
-//    FileReader reader {};
     file_reader_.readFile(filename);
-//    if (!file_reader_.headerErrors().empty() || !file_reader_.dataErrors().empty()) {
-//        auto reply = showReadingErrorsMessage(file_reader_);
-//        if (reply != QMessageBox::Yes) {
-//            return;
-//        }
-//    }
-//    measurement_ = reader.takeMeasurement();
-//    updatePlot();
 }
 
 void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
@@ -137,8 +131,7 @@ void MainWindow::onFrameItemChanged(const QRectF &rect)
 
 void MainWindow::onDataReadFinished()
 {
-    DEB << "MainWindow::onDataReadFinished()";
-
+    read_progress_dialog_->close();
     if (!file_reader_.headerErrors().empty() || !file_reader_.dataErrors().empty()) {
         auto reply = showReadingErrorsMessage(file_reader_);
         if (reply != QMessageBox::Yes) {
@@ -147,6 +140,5 @@ void MainWindow::onDataReadFinished()
     }
 
     measurement_ = file_reader_.takeMeasurement();
-//    DEB << measurement_
     updatePlot();
 }

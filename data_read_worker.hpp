@@ -18,6 +18,7 @@ public:
     DataStats takeStats();
 
 signals:
+    void progressChanged(qreal progress);
     void finished();
 
 private:

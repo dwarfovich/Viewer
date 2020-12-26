@@ -25,11 +25,6 @@ class FileReader : public QObject
         Parameters
     };
 
-    enum OrganizationAndAppParts {
-        OrganizationPart = 0,
-        ApplicationPart
-    };
-
 public:
     FileReader();
     ~FileReader();
@@ -41,7 +36,9 @@ public:
     const QStringList& dataErrors() const;
 
 signals:
+    void progressChanged(qreal progress);
     void finished();
+    void readingStarted(const QString& text);
 
 private:
     QStringList readHeaderLines(QTextStream& input) const;
@@ -61,12 +58,12 @@ private slots:
     void getWorkerResults();
 
 private:
-    QThread worker_thread_;
+    QThread* worker_thread_;
     std::unique_ptr<DataReadWorker> worker_;
     Measurement measurement_;
-    const QChar header_line_starter_ = '#';
     QStringList header_errors_;
     QStringList data_errors_;
+    const QChar header_line_starter_ = '#';
 };
 
 #endif // FILEREADER_HPP
