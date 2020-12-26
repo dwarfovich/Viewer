@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui_{new Ui::MainWindow}
     , preview_scene_{new PreviewPlotScene {plot_drawer_, this}}
     , plot_widget_{new PlotWidget {plot_drawer_, this}}
-    , data_read_progress_dialog_{new QProgressDialog {tr("Loading file"), {}, 0,100, this}}
+    , data_read_progress_dialog_{new QProgressDialog {tr("Loading file"), {}, 0, 100, this}}
 {
     ui_->setupUi(this);
     data_read_progress_dialog_->setWindowFlags(data_read_progress_dialog_->windowFlags() & ~Qt::WindowCloseButtonHint);
