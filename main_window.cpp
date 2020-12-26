@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui_->previewPlotView, &PreviewPlotView::frameItemPosChanged,
             this, &MainWindow::onPreviewFrameItemPosChanged);
+    connect(ui_->previewPlotView, &PreviewPlotView::sizeChanged,
+            this, &MainWindow::onPreviewViewSizeChanged);
 
     resize(1400, 900);
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
@@ -83,4 +85,9 @@ void MainWindow::updatePlot()
     int plot_area_height = plot_widget_->height();
     plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
     plot_widget_->drawArea(first, last, 0);
+}
+
+void MainWindow::onPreviewViewSizeChanged(const QSize &size)
+{
+    updatePlot();
 }

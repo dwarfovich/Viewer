@@ -12,11 +12,13 @@ public:
 
 signals:
     void frameItemPosChanged(const QPointF delta_pos);
+    void sizeChanged(const QSize& new_size);
 
 protected:
-    void mousePressEvent   (QMouseEvent *event);
-    void mouseMoveEvent    (QMouseEvent *event);
-    void mouseReleaseEvent (QMouseEvent *event);
+    void mousePressEvent   (QMouseEvent *event) override;
+    void mouseMoveEvent    (QMouseEvent *event) override;
+    void mouseReleaseEvent (QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private:
     QPointF click_location_ = {};

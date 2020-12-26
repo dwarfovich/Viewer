@@ -49,6 +49,10 @@ void PlotDrawer::generatePlotArea(int first, int last, int width, int height)
     const auto& data = measurement_->data;
     const auto& stats = measurement_->stats;
 
+    if (data.empty()) {
+        return;
+    }
+
     int first_point = (data.size() * first) / 100;
     if (first_point == 0) {
         ++first_point;

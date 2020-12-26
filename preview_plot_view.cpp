@@ -1,6 +1,7 @@
 #include "preview_plot_view.hpp"
 
 #include <QMouseEvent>
+#include <QResizeEvent>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -32,4 +33,9 @@ void PreviewPlotView::mouseReleaseEvent(QMouseEvent *event)
         is_scrolling_ = false;
     }
     QGraphicsView::mouseReleaseEvent(event);
+}
+
+void PreviewPlotView::resizeEvent(QResizeEvent *event)
+{
+    emit sizeChanged(event->size());
 }

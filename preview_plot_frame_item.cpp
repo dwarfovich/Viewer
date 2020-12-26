@@ -20,10 +20,7 @@ void PreviewPlotFrameItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     QBrush brush;
     brush.setStyle(Qt::SolidPattern);
     brush.setColor({128, 128, 128, 128});
-//    brush.setColor(Qt::red);
-//    painter->setBrush(brush);
     painter->fillRect(0, 0, width_, height_, brush);
-//    painter->drawRect(boundingRect());
 }
 
 int PreviewPlotFrameItem::width() const

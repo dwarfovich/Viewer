@@ -29,11 +29,14 @@ public slots:
 private:
     void updatePlot();
 
+private slots:
+    void onPreviewViewSizeChanged(const QSize& size);
+
 private:
     Measurement measurement_;
     Ui::MainWindow* ui_;
+    PlotDrawer plot_drawer_;
     PreviewPlotScene* preview_scene_;
     PlotWidget* plot_widget_;
-    PlotDrawer plot_drawer_;
 };
 #endif // MAINWINDOW_HPP
