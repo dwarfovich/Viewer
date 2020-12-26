@@ -3,6 +3,7 @@
 
 #include "measurement.hpp"
 #include "plot_drawer.hpp"
+#include "file_reader.hpp"
 
 #include <QMainWindow>
 
@@ -33,6 +34,7 @@ private:
 private slots:
     void onPreviewViewSizeChanged(const QSize& size);
     void onFrameItemChanged(const QRectF& rect);
+    void onDataReadFinished();
 
 private:
     Measurement measurement_;
@@ -40,5 +42,6 @@ private:
     PlotDrawer plot_drawer_;
     PreviewPlotScene* preview_scene_;
     PlotWidget* plot_widget_;
+    FileReader file_reader_;
 };
 #endif // MAINWINDOW_HPP

@@ -1,6 +1,7 @@
 #include "file_reader.hpp"
 #include "measurement.hpp"
 #include "header.hpp"
+#include "data_read_worker.hpp"
 
 #include <QTextStream>
 #include <QFile>
@@ -14,6 +15,16 @@
 FileReader::FileReader()
 {}
 
+FileReader::~FileReader()
+{
+    worker_thread_.quit();
+    if(!worker_thread_.wait(3000))
+    {
+        worker_thread_.terminate();
+        worker_thread_.wait();
+    }
+}
+
 void FileReader::readFile(const QString &filename)
 {
     QFile file {filename};
@@ -23,9 +34,7 @@ void FileReader::readFile(const QString &filename)
         auto header_lines = readHeaderLines(input);
         const auto& header_errors = parseHeaderLines(header_lines);
         header_errors_.append(header_errors);
-//        printHeader();
         readData(input);
-        emit finished();
     } else {
         data_errors_.push_back(tr("Cannot open file"));
     }
@@ -128,40 +137,13 @@ void FileReader::parseParameters(const QStringList &header_lines, int first_para
 
 void FileReader::readData(QTextStream &input)
 {
-    QTime timer;
-    auto& data = measurement_.data;
-    timer.start();
-    data.reserve(dataReservedSize());
     QString text = input.readAll();
-    qreal secs = timer.elapsed() / qreal(1000);
-    DEB << "Reading data:" << secs;
-    int first = 0;
-    while (first < text.size() - 1) {
-        // first value
-        int delimiter_pos = text.indexOf(' ', first);
-        QStringRef first_value (&text, first, delimiter_pos - first);
-        // second value
-        int end_of_line = text.indexOf('\n', delimiter_pos + 1);
-        QStringRef second_value (&text, delimiter_pos + 1, end_of_line - delimiter_pos - 1);
 
-        QPointF point;
-        point.setX(first_value.toDouble());
-        point.setY(second_value.toDouble());
-        data.push_back(point);
-
-        measurement_.stats.min_x = std::min(measurement_.stats.min_x, point.x());
-        measurement_.stats.max_x = std::max(measurement_.stats.max_x, point.x());
-        measurement_.stats.min_y = std::min(measurement_.stats.min_y, point.y());
-        measurement_.stats.max_y = std::max(measurement_.stats.max_y, point.y());
-
-        first = end_of_line + 1;
-    }
-
-    secs = timer.elapsed() / qreal(1000);
-    DEB << "Parsing time: " << secs;
-    DEB << "Data size:" << data.size();
-
-    measurement_.header.data_size = data.size();
+    worker_ = std::make_unique<DataReadWorker>();
+    worker_->moveToThread(&worker_thread_);
+    connect(worker_.get(), &DataReadWorker::finished, this, &FileReader::getWorkerResults);
+    worker_thread_.start();
+    worker_->read(text);
 }
 
 void FileReader::clearMeasurement()
@@ -186,6 +168,13 @@ void FileReader::printHeader() const
     }
 }
 
+void FileReader::getWorkerResults()
+{
+    measurement_.data = worker_->takeData();
+    measurement_.stats = worker_->takeStats();
+    emit finished();
+}
+
 const QStringList &FileReader::dataErrors() const
 {
     return data_errors_;
@@ -194,16 +183,6 @@ const QStringList &FileReader::dataErrors() const
 const QStringList &FileReader::headerErrors() const
 {
     return header_errors_;
-}
-
-size_t FileReader::dataReservedSize() const
-{
-    return data_reserved_size_;
-}
-
-void FileReader::setDataReservedSize(const size_t &size)
-{
-    data_reserved_size_ = size;
 }
 
 Measurement FileReader::takeMeasurement()

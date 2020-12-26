@@ -1,12 +1,15 @@
 #ifndef FILEREADER_HPP
 #define FILEREADER_HPP
 
-#include <measurement.hpp>
+#include "measurement.hpp"
+#include "data_read_worker.hpp"
 
 #include <QObject>
 #include <QString>
+#include <QThread>
 
-struct Measurement;
+#include <memory>
+
 class QFile;
 class QTextStream;
 
@@ -29,12 +32,10 @@ class FileReader : public QObject
 
 public:
     FileReader();
+    ~FileReader();
 
     void readFile(const QString& filename);
     bool hasErrors() const;
-
-    size_t dataReservedSize() const;
-    void setDataReservedSize(const size_t &size);
     Measurement takeMeasurement();
     const QStringList& headerErrors() const;
     const QStringList& dataErrors() const;
@@ -56,10 +57,14 @@ private:
 
     void printHeader() const;
 
+private slots:
+    void getWorkerResults();
+
 private:
+    QThread worker_thread_;
+    std::unique_ptr<DataReadWorker> worker_;
     Measurement measurement_;
     const QChar header_line_starter_ = '#';
-    size_t data_reserved_size_ = 5'000'000;
     QStringList header_errors_;
     QStringList data_errors_;
 };

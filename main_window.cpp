@@ -43,11 +43,12 @@ MainWindow::MainWindow(QWidget *parent)
             preview_scene_, &PreviewPlotScene::onPlotScaleRequest);
     connect(preview_scene_, &PreviewPlotScene::frameItemChanged,
             this, &MainWindow::onFrameItemChanged);
+    connect(&file_reader_, &FileReader::finished, this, &MainWindow::onDataReadFinished);
 
-    resize(1400, 900);
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
     connect(ui_->actionQuit, &QAction::triggered, this, &MainWindow::close);
 
+    resize(1400, 900);
     show();
     loadFile();
 }
@@ -60,16 +61,16 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
-    FileReader reader {};
-    reader.readFile(filename);
-    if (!reader.headerErrors().empty() || !reader.dataErrors().empty()) {
-        auto reply = showReadingErrorsMessage(reader);
-        if (reply != QMessageBox::Yes) {
-            return;
-        }
-    }
-    measurement_ = reader.takeMeasurement();
-    updatePlot();
+//    FileReader reader {};
+    file_reader_.readFile(filename);
+//    if (!file_reader_.headerErrors().empty() || !file_reader_.dataErrors().empty()) {
+//        auto reply = showReadingErrorsMessage(file_reader_);
+//        if (reply != QMessageBox::Yes) {
+//            return;
+//        }
+//    }
+//    measurement_ = reader.takeMeasurement();
+//    updatePlot();
 }
 
 void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
@@ -131,5 +132,21 @@ void MainWindow::onPreviewViewSizeChanged(const QSize &size)
 
 void MainWindow::onFrameItemChanged(const QRectF &rect)
 {
+    updatePlot();
+}
+
+void MainWindow::onDataReadFinished()
+{
+    DEB << "MainWindow::onDataReadFinished()";
+
+    if (!file_reader_.headerErrors().empty() || !file_reader_.dataErrors().empty()) {
+        auto reply = showReadingErrorsMessage(file_reader_);
+        if (reply != QMessageBox::Yes) {
+            return;
+        }
+    }
+
+    measurement_ = file_reader_.takeMeasurement();
+//    DEB << measurement_
     updatePlot();
 }
