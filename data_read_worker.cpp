@@ -27,10 +27,7 @@ void DataReadWorker::read(const QString &text)
         point.setY(second_value.toDouble());
         data_.push_back(point);
 
-        stats_.min_x = std::min(stats_.min_x, point.x());
-        stats_.max_x = std::max(stats_.max_x, point.x());
-        stats_.min_y = std::min(stats_.min_y, point.y());
-        stats_.max_y = std::max(stats_.max_y, point.y());
+        updateDataStats(point);
 
         ++progress_step;
         if (progress_step == steps_per_progress_) {
@@ -55,4 +52,12 @@ std::vector<QPointF> DataReadWorker::takeData()
 DataStats DataReadWorker::takeStats()
 {
     return std::move(stats_);
+}
+
+void DataReadWorker::updateDataStats(const QPointF &new_value)
+{
+    stats_.min_x = std::min(stats_.min_x, new_value.x());
+    stats_.max_x = std::max(stats_.max_x, new_value.x());
+    stats_.min_y = std::min(stats_.min_y, new_value.y());
+    stats_.max_y = std::max(stats_.max_y, new_value.y());
 }

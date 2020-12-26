@@ -13,24 +13,19 @@
 #define DEB qDebug()
 
 FileReader::FileReader()
-    : worker_thread_{new QThread {}}
+//    : worker_thread_{new QThread {}}
 {
     worker_ = std::make_unique<DataReadWorker>();
-    worker_->moveToThread(worker_thread_);
+    worker_->moveToThread(&worker_thread_);
     connect(worker_.get(), &DataReadWorker::finished, this, &FileReader::getWorkerResults);
     connect(worker_.get(), &DataReadWorker::progressChanged, this, &FileReader::progressChanged);
-    worker_thread_->start();
-    DEB << connect(this, &FileReader::readingStarted, worker_.get(), &DataReadWorker::read);
+    worker_thread_.start();
+    connect(this, &FileReader::readingStarted, worker_.get(), &DataReadWorker::read);
 }
 
 FileReader::~FileReader()
 {
-    worker_thread_->quit();
-//    if(!worker_thread_.wait(3000))
-//    {
-//        worker_thread_.terminate();
-//        worker_thread_.wait();
-//    }
+    worker_thread_.quit();
 }
 
 void FileReader::readFile(const QString &filename)
@@ -146,16 +141,7 @@ void FileReader::parseParameters(const QStringList &header_lines, int first_para
 void FileReader::readData(QTextStream &input)
 {
     QString text = input.readAll();
-
-//    worker_ = std::make_unique<DataReadWorker>();
-//    worker_->moveToThread(worker_thread_);
-//    connect(worker_.get(), &DataReadWorker::finished, this, &FileReader::getWorkerResults);
-//    connect(worker_.get(), &DataReadWorker::progressChanged, this, &FileReader::progressChanged);
-//    worker_thread_->start();
-    DEB << "Starting thread";
-//    worker_->read(text);
     emit readingStarted(text);
-    DEB << "worker finished";
 }
 
 void FileReader::clearMeasurement()

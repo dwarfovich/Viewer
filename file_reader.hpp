@@ -58,7 +58,7 @@ private slots:
     void getWorkerResults();
 
 private:
-    QThread* worker_thread_;
+    QThread worker_thread_;
     std::unique_ptr<DataReadWorker> worker_;
     Measurement measurement_;
     QStringList header_errors_;

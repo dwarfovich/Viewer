@@ -22,6 +22,9 @@ signals:
     void finished();
 
 private:
+    void updateDataStats(const QPointF& new_value);
+
+private:
     std::vector<QPointF> data_;
     DataStats stats_;
     size_t reserved_data_size_ = 5'000'000;
