@@ -14,7 +14,6 @@ struct Header
     QDateTime start_time;
     QString duration;
     std::vector<QString> parameters;
-    size_t data_size;
 };
 
 #endif // HEADER_HPP
