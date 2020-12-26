@@ -30,7 +30,6 @@ private:
     void updatePlot();
     int showReadingErrorsMessage(const FileReader& reader) const;
 
-
 private slots:
     void onPreviewViewSizeChanged(const QSize& size);
     void onFrameItemChanged(const QRectF& rect);
