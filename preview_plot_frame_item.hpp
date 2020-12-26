@@ -16,8 +16,8 @@ public:
     void setHeight(int height);
 
 private:
-    int width_ = 0;
-    int height_ = 0;
+    int width_ = 100;
+    int height_ = 100;
 };
 
 #endif // PREVIEWPLOTFRAMEITEM_HPP

@@ -5,6 +5,7 @@
 #include "plot_drawer.hpp"
 #include "plot_widget.hpp"
 #include "preview_plot_frame_item.hpp"
+#include "preview_plot_scene.hpp"
 
 #include <QGraphicsScene>
 #include <QAction>
@@ -19,8 +20,8 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , ui_{new Ui::MainWindow}
-    , preview_scene_{new QGraphicsScene {this}}
-    , plot_widget_{new PlotWidget {measurement_, this}}
+    , preview_scene_{new PreviewPlotScene {plot_drawer_, this}}
+    , plot_widget_{new PlotWidget {plot_drawer_, this}}
 {
     ui_->setupUi(this);
     ui_->previewPlotView->setScene(preview_scene_);
@@ -28,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui_->previewPlotView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui_->splitter->setSizes({10, 200});
     ui_->scrollArea->setWidget(plot_widget_);
+
+    plot_drawer_.setMeasurement(&measurement_);
 
     connect(ui_->previewPlotView, &PreviewPlotView::frameItemPosChanged,
             this, &MainWindow::onPreviewFrameItemPosChanged);
@@ -55,40 +58,29 @@ void MainWindow::loadFile()
 
 void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
 {
+    auto* frame_item = preview_scene_->frameItem();
     qreal new_x = 0.;
-    if (delta_pos.x() < 0) {
-        new_x = frame_item_->x() + delta_pos.x();
-        if (new_x < 0) {
-            new_x = 0.;
-        }
+    if (delta_pos.x() < 0.) {
+        new_x = std::max(frame_item->x() + delta_pos.x(), 0.);
     } else {
-        new_x = std::min(delta_pos.x(), qreal(ui_->previewPlotView->width() - frame_item_->width()));
-
+        new_x = std::min(delta_pos.x(), qreal(ui_->previewPlotView->width() - frame_item->width()));
     }
-    frame_item_->setX(new_x);
+    frame_item->setX(new_x);
 
-    qreal preview_width = ui_->previewPlotView->width();
-    int first = (frame_item_->x() * 100) / preview_width;
-    int last = ((frame_item_->x() + frame_item_->width()) * 100) / preview_width;
-    int plot_height = plot_widget_->width();
-    plot_widget_->drawArea(first, last, plot_height);
+    updatePlot();
 }
 
 void MainWindow::updatePlot()
 {
-    PlotDrawer drawer {&measurement_};
-    QTime timer;
-    timer.start();
-    drawer.generatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
-    qreal secs = timer.elapsed() / qreal(1000);
-    DEB << "Preview painting time: " << secs;
-    auto* item = new QGraphicsPixmapItem {drawer.plotPreview()};
-    item->setZValue(1);
-    preview_scene_->addItem(item);
-    plot_widget_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    frame_item_ = new PreviewPlotFrameItem {};
-    frame_item_->setWidth(500);
-    frame_item_->setHeight(ui_->previewPlotView->size().height());
-    frame_item_->setZValue(2);
-    preview_scene_->addItem(frame_item_);
+    preview_scene_->updatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
+    auto* frame_item = preview_scene_->frameItem();
+    frame_item->setHeight(ui_->previewPlotView->height());
+    Q_ASSERT(frame_item);
+    qreal preview_width = ui_->previewPlotView->width();
+    int first = (frame_item->x() * 100) / preview_width;
+    int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
+    int plot_area_width = plot_widget_->width();
+    int plot_area_height = plot_widget_->height();
+    plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
+    plot_widget_->drawArea(first, last, 0);
 }

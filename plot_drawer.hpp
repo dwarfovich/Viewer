@@ -14,7 +14,7 @@ class PlotDrawer: public QObject
     Q_OBJECT
 
 public:
-    PlotDrawer(const Measurement* measurement);
+    PlotDrawer(const Measurement* measurement = nullptr);
 
     void generatePreview(int width, int height);
     void generatePlotArea(int first, int last, int width, int height);

@@ -6,10 +6,10 @@
 #include <QDebug>
 #define DEB qDebug()
 
-PlotWidget::PlotWidget(const Measurement &m, QWidget *parent)
+PlotWidget::PlotWidget(PlotDrawer &drawer, QWidget *parent)
     : QWidget{parent}
-    , drawer_{&m}
-    , m_{m}
+    , drawer_{drawer}
+//    , m_{drawer}
 {
     setLayout(new QHBoxLayout {this});
 }

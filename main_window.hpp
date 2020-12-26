@@ -2,16 +2,17 @@
 #define MAINWINDOW_HPP
 
 #include "measurement.hpp"
+#include "plot_drawer.hpp"
 
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
-class QGraphicsScene;
 QT_END_NAMESPACE
 
 class PlotWidget;
 class PreviewPlotFrameItem;
+class PreviewPlotScene;
 
 class MainWindow : public QMainWindow
 {
@@ -30,9 +31,9 @@ private:
 
 private:
     Measurement measurement_;
-    Ui::MainWindow *ui_;
-    QGraphicsScene* preview_scene_;
+    Ui::MainWindow* ui_;
+    PreviewPlotScene* preview_scene_;
     PlotWidget* plot_widget_;
-    PreviewPlotFrameItem* frame_item_;
+    PlotDrawer plot_drawer_;
 };
 #endif // MAINWINDOW_HPP

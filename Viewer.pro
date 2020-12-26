@@ -19,6 +19,7 @@ SOURCES += \
     plot_drawer.cpp \
     plot_widget.cpp \
     preview_plot_frame_item.cpp \
+    preview_plot_scene.cpp \
     preview_plot_view.cpp
 
 HEADERS += \
@@ -31,6 +32,7 @@ HEADERS += \
     plot_drawer.hpp \
     plot_widget.hpp \
     preview_plot_frame_item.hpp \
+    preview_plot_scene.hpp \
     preview_plot_view.hpp
 
 FORMS += \

@@ -15,7 +15,7 @@ class PlotWidget : public QWidget
     Q_OBJECT
 
 public:
-    PlotWidget(const Measurement& m, QWidget* parent = nullptr);
+    PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
     QPixmap plot() const;
     void setPlot(const QPixmap &plot);
@@ -26,9 +26,9 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private:
+    PlotDrawer& drawer_;
     QPixmap plot_;
-    PlotDrawer drawer_;
-    const Measurement& m_;
+//    const Measurement& m_;
     qreal x_scale = 1.0;
 };
 
