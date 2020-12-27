@@ -28,7 +28,7 @@ PreviewPlotFrameItem *PreviewPlotScene::frameItem() const
 
 void PreviewPlotScene::updatePreview(int width, int height)
 {
-    drawer_.generatePreview(width, height);
+    drawer_.drawPreview(width, height);
     preview_item_->setPixmap(drawer_.plotPreview());
     update();
 }

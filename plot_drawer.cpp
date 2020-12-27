@@ -40,7 +40,7 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
 
 }
 
-void PlotDrawer::generatePreview(int width, int height)
+void PlotDrawer::drawPreview(int width, int height)
 {
     PlotParameters parameters {plot_preview_};
     parameters.first_point = 0;
@@ -55,7 +55,7 @@ void PlotDrawer::generatePreview(int width, int height)
     drawPlot(parameters);
 }
 
-void PlotDrawer::generatePlotArea(int first, int last, int width, int height)
+void PlotDrawer::drawPlot(int first, int last, int width, int height)
 {
     PlotParameters parameters {plot_};
     const auto& data = measurement_->data;
@@ -88,11 +88,6 @@ const QPixmap &PlotDrawer::plot() const
 const QPixmap& PlotDrawer::plotPreview() const
 {
     return plot_preview_;
-}
-
-const Measurement *PlotDrawer::measurement() const
-{
-    return measurement_;
 }
 
 void PlotDrawer::setMeasurement(const Measurement *measurement)

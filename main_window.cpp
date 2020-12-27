@@ -93,7 +93,7 @@ void MainWindow::updatePlot()
     int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
     int plot_area_width = plot_widget_->width();
     int plot_area_height = plot_widget_->height();
-    plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
+    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
     plot_widget_->drawArea(first, last);
 }
 
@@ -137,7 +137,7 @@ void MainWindow::onFrameItemChanged(const QRectF& rect)
     int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
     int plot_area_width = plot_widget_->width();
     int plot_area_height = plot_widget_->height();
-    plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
+    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
     plot_widget_->drawArea(first, last);
 }
 
