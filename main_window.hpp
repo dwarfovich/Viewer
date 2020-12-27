@@ -27,10 +27,11 @@ public:
 
 public slots:
     void loadFile();
-    void onPreviewFrameItemPosChanged(const QPointF& new_pos);
+    void onPreviewFrameItemPosChanged();
+    void updatePreviewPlot();
+    void updatePlot();
 
 private:
-    void updatePlot();
     int showReadingErrorsMessage(const FileReader& reader) const;
 
 private slots:

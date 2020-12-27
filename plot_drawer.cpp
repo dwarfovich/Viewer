@@ -2,7 +2,6 @@
 #include "measurement.hpp"
 
 #include <QPainter>
-#include <QPen>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -11,79 +10,74 @@ PlotDrawer::PlotDrawer(const Measurement *measurement)
     : measurement_{measurement}
 {}
 
-void PlotDrawer::generatePreview(int width, int height)
+void PlotDrawer::drawPlot(const PlotParameters& parameters)
 {
-    const auto& data = measurement_->data;
-    const auto& stats = measurement_->stats;
-
-    plot_preview_ = QPixmap{width, height};
-    QPainter painter {&plot_preview_};
-    plot_preview_.fill(Qt::black);
+    QPixmap& pixmap = parameters.pixmap;
+    pixmap = QPixmap{parameters.width, parameters.height};
+    QPainter painter {&pixmap};
+    pixmap.fill(parameters.background_color);
     painter.setRenderHint(QPainter::Antialiasing);
-    QPen pen {Qt::green};
-    pen.setWidth(1);
-    painter.setPen(pen);
+    painter.setPen(parameters.pen);
 
-    qreal delta_x = stats.max_x - stats.min_x;
-    qreal delta_y = stats.max_y - stats.min_y;
-    size_t estimated_rarefaction = std::max(size_t(1), data.size() / width);
-    size_t rarefaction = std::min(default_rarefraction_, estimated_rarefaction);
-    rarefaction = 1;
-    for (size_t i = rarefaction; i < data.size(); i += rarefaction) {
+    const auto& data = measurement_->data;
+    const auto& rarefaction = parameters.rarefaction;
+    const auto& first = parameters.first_point;
+    const auto& last = parameters.last_point;
+    const auto& delta_x = parameters.max_values.x() - parameters.min_values.x();
+    const auto& delta_y = parameters.max_values.y() - parameters.min_values.y();
+    const auto& x_coefficient = parameters.width / delta_x;
+    const auto& y_coefficient = parameters.height / delta_y;
+    for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
         QPointF point1;
-        point1.setX(width  * (data[i - rarefaction].x() - stats.min_x) / delta_x);
-        point1.setY(height * (data[i - rarefaction].y() - stats.min_y) / delta_y);
+        point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.min_values.x()));
+        point1.setY(y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y()));
         QPointF point2;
-//         TODO: Инвертировать значения по y
-        point2.setX(width  * (data[i].x() - stats.min_x) / delta_x);
-        point2.setY(height * (data[i].y() - stats.min_y) / delta_y);
+//        //         TODO: Инвертировать значения по y
+        point2.setX(x_coefficient * (data[i].x() - parameters.min_values.x()));
+        point2.setY(y_coefficient * (data[i].y() - parameters.min_values.y()));
         painter.drawLine(point1, point2);
-//        DEB << p1 << p2;
     }
 
-    painter.drawRect(0, 0, width, height);
+}
+
+void PlotDrawer::generatePreview(int width, int height)
+{
+    PlotParameters parameters {plot_preview_};
+    parameters.first_point = 0;
+    parameters.last_point = measurement_->data.size() - 1;
+    parameters.width = width;
+    parameters.height = height;
+    parameters.rarefaction = 1;
+    const auto& stats = measurement_->stats;
+    parameters.min_values = {stats.min_x, stats.min_y};
+    parameters.max_values = {stats.max_x, stats.max_y};
+
+    drawPlot(parameters);
 }
 
 void PlotDrawer::generatePlotArea(int first, int last, int width, int height)
 {
+    PlotParameters parameters {plot_};
     const auto& data = measurement_->data;
-    const auto& stats = measurement_->stats;
-
-    if (data.empty()) {
-        return;
+    parameters.first_point = (data.size() * first) / 100;
+    if (parameters.first_point == 0) {
+        ++parameters.first_point;
     }
-
-    int first_point = (data.size() * first) / 100;
-    if (first_point == 0) {
-        ++first_point;
+    parameters.last_point = (data.size() * last) / 100;
+    if (parameters.last_point >= data.size()) {
+        parameters.last_point = data.size() - 1;
     }
-    int last_point = (data.size() * last) / 100;
-    if (last_point >= data.size()) {
-        last_point = data.size() - 1;
-    }
-    plot_ = QPixmap{width, height};
-    QPainter painter {&plot_};
-    plot_.fill(Qt::black);
-    painter.setRenderHint(QPainter::Antialiasing);
-    QPen pen {Qt::green};
-    painter.setPen(pen);
-
+    parameters.width = width;
+    parameters.height = height;
+    parameters.rarefaction = 1;
+    const auto& first_point = parameters.first_point;
+    const auto& last_point = parameters.last_point;
     auto min_max_y = std::minmax_element(data.begin() + first_point, data.begin() + last_point,
                                          [](const QPointF p1, const QPointF& p2){ return p1.y() < p2.y();});
-    qreal delta_x = stats.max_x - stats.min_x;
-    qreal delta_y = stats.max_y - stats.min_y;
-    delta_x = data[last_point].x() - data[first_point].x();
-    delta_y = min_max_y.second->y() - min_max_y.first->y();
-    for (size_t i = first_point; i <= last_point; i += 1) {
-        QPointF point1;
-        point1.setX(width  * (data[i - 1].x() - data[first_point].x()) / delta_x);
-        point1.setY(height * (data[i - 1].y() - min_max_y.first->y()) / delta_y);
-        QPointF point2;
-//         TODO: Инвертировать значения по y
-        point2.setX(width  * (data[i].x() - data[first_point].x()) / delta_x);
-        point2.setY(height * (data[i].y() - min_max_y.first->y()) / delta_y);
-        painter.drawLine(point1, point2);
-    }
+    parameters.min_values = {data[first_point].x(), min_max_y.first->y()};
+    parameters.max_values = {data[last_point].x(), min_max_y.second->y()};
+
+    drawPlot(parameters);
 }
 
 const QPixmap &PlotDrawer::plot() const

@@ -26,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui_->setupUi(this);
     data_read_progress_dialog_->setWindowFlags(data_read_progress_dialog_->windowFlags() & ~Qt::WindowCloseButtonHint);
+    data_read_progress_dialog_->close();
 
     ui_->previewPlotView->setScene(preview_scene_);
     ui_->previewPlotView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -66,12 +67,19 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
-    file_reader_.readFile(filename);
+    if (!filename.isEmpty()) {
+        file_reader_.readFile(filename);
+    }
 }
 
-void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
+void MainWindow::onPreviewFrameItemPosChanged()
 {
     updatePlot();
+}
+
+void MainWindow::updatePreviewPlot()
+{
+    preview_scene_->updatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
 }
 
 void MainWindow::updatePlot()
@@ -114,12 +122,23 @@ int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
 
 void MainWindow::onPreviewViewSizeChanged(const QSize& size)
 {
-    updatePlot();
+    if (measurement_.data.size() > 0){
+        updatePlot();
+    }
 }
 
 void MainWindow::onFrameItemChanged(const QRectF& rect)
 {
-    updatePlot();
+    auto* frame_item = preview_scene_->frameItem();
+    frame_item->setHeight(ui_->previewPlotView->height());
+    Q_ASSERT(frame_item);
+    qreal preview_width = ui_->previewPlotView->width();
+    int first = (frame_item->x() * 100) / preview_width;
+    int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
+    int plot_area_width = plot_widget_->width();
+    int plot_area_height = plot_widget_->height();
+    plot_drawer_.generatePlotArea(first, last, plot_area_width, plot_area_height);
+    plot_widget_->drawArea(first, last);
 }
 
 void MainWindow::onDataReadFinished()

@@ -34,7 +34,7 @@ void FileReader::readFile(const QString &filename)
     if (file.open(QFile::ReadOnly)) {
         clearMeasurement();
         QTextStream input {&file};
-        auto header_lines = readHeaderLines(input);
+        const auto& header_lines = readHeaderLines(input);
         const auto& header_errors = parseHeaderLines(header_lines);
         header_errors_.append(header_errors);
         readData(input);
