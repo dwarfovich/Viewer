@@ -14,7 +14,6 @@ SOURCES += \
     file_reader.cpp \
     header.cpp \
     main.cpp \
-    main_view.cpp \
     main_window.cpp \
     measurement.cpp \
     plot_drawer.cpp \
@@ -28,7 +27,6 @@ HEADERS += \
     data_stats.hpp \
     file_reader.hpp \
     header.hpp \
-    main_view.hpp \
     main_window.hpp \
     measurement.hpp \
     plot_drawer.hpp \

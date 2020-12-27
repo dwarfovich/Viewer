@@ -25,6 +25,10 @@ public slots:
 
 signals:
     void frameItemChanged(const QRectF& rect);
+    void frameItemPosChanged(const QPointF& new_pos);
+
+//private slots:
+//    void onFrameItemPosChanged(const QPointF& new_pos);
 
 private:
     PlotDrawer& drawer_;

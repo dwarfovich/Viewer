@@ -18,6 +18,7 @@ PreviewPlotScene::PreviewPlotScene(PlotDrawer &drawer, QObject* parent)
     frame_item_->setZValue(2);
     addItem(preview_item_);
     addItem(frame_item_);
+    connect(frame_item_, &PreviewPlotFrameItem::posChanged, this, &PreviewPlotScene::frameItemPosChanged);
 }
 
 PreviewPlotFrameItem *PreviewPlotScene::frameItem() const

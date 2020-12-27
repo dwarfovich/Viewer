@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     plot_drawer_.setMeasurement(&measurement_);
 
-    connect(ui_->previewPlotView, &PreviewPlotView::frameItemPosChanged,
+    connect(preview_scene_, &PreviewPlotScene::frameItemPosChanged,
             this, &MainWindow::onPreviewFrameItemPosChanged);
     connect(ui_->previewPlotView, &PreviewPlotView::sizeChanged,
             this, &MainWindow::onPreviewViewSizeChanged);
@@ -71,15 +71,6 @@ void MainWindow::loadFile()
 
 void MainWindow::onPreviewFrameItemPosChanged(const QPointF &delta_pos)
 {
-    auto* frame_item = preview_scene_->frameItem();
-    qreal new_x = 0.;
-    if (delta_pos.x() < 0.) {
-        new_x = std::max(frame_item->x() + delta_pos.x(), 0.);
-    } else {
-        new_x = std::min(delta_pos.x(), qreal(ui_->previewPlotView->width() - frame_item->width()));
-    }
-    frame_item->setX(new_x);
-
     updatePlot();
 }
 
@@ -121,12 +112,12 @@ int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
     return reply;
 }
 
-void MainWindow::onPreviewViewSizeChanged(const QSize &size)
+void MainWindow::onPreviewViewSizeChanged(const QSize& size)
 {
     updatePlot();
 }
 
-void MainWindow::onFrameItemChanged(const QRectF &rect)
+void MainWindow::onFrameItemChanged(const QRectF& rect)
 {
     updatePlot();
 }

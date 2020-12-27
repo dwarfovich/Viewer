@@ -2,13 +2,23 @@
 
 #include <QPainter>
 #include <QBrush>
+#include <QGraphicsScene>
+
+#include <QDebug>
+#define DEB qDebug()
 
 PreviewPlotFrameItem::PreviewPlotFrameItem(QGraphicsItem *parent)
-    : QGraphicsItem{parent}
+    : QGraphicsObject{parent}
 {
-
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsMovable, true);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
 }
 
+int PreviewPlotFrameItem::type() const
+{
+    return Type;
+}
 
 QRectF PreviewPlotFrameItem::boundingRect() const
 {
@@ -41,4 +51,20 @@ int PreviewPlotFrameItem::height() const
 void PreviewPlotFrameItem::setHeight(int height)
 {
     height_ = height;
+}
+
+QVariant PreviewPlotFrameItem::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant& value)
+{
+    if (change == ItemPositionChange) {
+        const auto& new_pos = value.toPointF();
+        const auto& scene_rect = scene()->sceneRect();
+        if (new_pos.x() < 0.) {
+            return QPointF{0., pos().y()};
+        } else {
+            return QPointF{std::min(new_pos.x(), scene_rect.right() - width()), pos().y()};
+        }
+    } else if (change == ItemPositionHasChanged) {
+        emit posChanged(pos());
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
