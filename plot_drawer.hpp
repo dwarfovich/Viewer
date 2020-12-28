@@ -29,9 +29,8 @@ public:
     PlotDrawer(const Measurement* measurement = nullptr);
 
     void drawPlot(const PlotParameters& parameters);
-    void drawMainPlot(const PlotParameters& parameters);
     void drawPreview(int width, int height);
-    void drawPlot(qreal start_percent, qreal end_percent, int width, int height);
+    void drawMainPlot(size_t first_point, size_t last_point, int width, int height);
     const QPixmap& plot() const;
     const QPixmap& plotPreview() const;
     void setMeasurement(const Measurement *measurement);

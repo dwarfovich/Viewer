@@ -84,17 +84,34 @@ void MainWindow::updatePreviewPlot()
 
 void MainWindow::updatePlot()
 {
-    preview_scene_->updatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
     auto* frame_item = preview_scene_->frameItem();
-    frame_item->setHeight(ui_->previewPlotView->height());
     Q_ASSERT(frame_item);
-    qreal preview_width = ui_->previewPlotView->width();
-    qreal first = (frame_item->x() * 100.) / qreal(preview_width);
-    qreal last = ((frame_item->x() + frame_item->width()) * 100.) / qreal(preview_width);
-    int plot_area_width = plot_widget_->width();
-    int plot_area_height = plot_widget_->height();
-    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
-    plot_widget_->drawArea(first, last);
+    qreal preview_width = preview_scene_->width();
+    qreal first = (frame_item->x() * 100.) / preview_width;
+    qreal last = ((frame_item->x() + frame_item->width()) * 100.) / preview_width;
+    qreal x_range = measurement_.stats.max_x - measurement_.stats.min_x;
+    qreal last_x = (x_range * last) / 100. + measurement_.stats.min_x;
+    qreal first_x = (x_range * first) / 100. + measurement_.stats.min_x;
+    bool first_found = false;
+    size_t first_point = 0;
+    size_t last_point = 0;
+    for (size_t i = 0; i < measurement_.data.size(); ++i) {
+        if (!first_found && measurement_.data[i].x() >= first_x) {
+            first_point = i;
+            first_found = true;
+        }
+        if (measurement_.data[i].x() >= last_x) {
+            last_point = i;
+            break;
+        }
+    }
+    if (first_point == last_point && first_point != 0) {
+        --first_point;
+        if (last_point < measurement_.data.size() - 1) {
+            ++last_point;
+        }
+    }
+    plot_widget_->drawArea(first_point, last_point);
 }
 
 int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
@@ -129,16 +146,18 @@ void MainWindow::onPreviewViewSizeChanged(const QSize& size)
 
 void MainWindow::onFrameItemChanged(const QRectF& rect)
 {
-    auto* frame_item = preview_scene_->frameItem();
-    frame_item->setHeight(ui_->previewPlotView->height());
-    Q_ASSERT(frame_item);
-    qreal preview_width = ui_->previewPlotView->width();
-    int first = (frame_item->x() * 100) / preview_width;
-    int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
-    int plot_area_width = plot_widget_->width();
-    int plot_area_height = plot_widget_->height();
-    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
-    plot_widget_->drawArea(first, last);
+//    auto* frame_item = preview_scene_->frameItem();
+////    frame_item->setHeight(ui_->previewPlotView->height());
+//    Q_ASSERT(frame_item);
+//    qreal preview_width = ui_->previewPlotView->width();
+//    int first = (frame_item->x() * 100) / preview_width;
+//    int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
+//    int plot_area_width = plot_widget_->width();
+//    int plot_area_height = plot_widget_->height();
+//    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
+//    plot_widget_->drawArea(first, last);
+
+    updatePlot();
 }
 
 void MainWindow::onDataReadFinished()
@@ -152,6 +171,7 @@ void MainWindow::onDataReadFinished()
     }
 
     measurement_ = file_reader_.takeMeasurement();
+    preview_scene_->frameItem()->setHeight(ui_->previewPlotView->height());
     updatePreviewPlot();
     updatePlot();
 }

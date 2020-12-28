@@ -39,35 +39,6 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
     }
 }
 
-void PlotDrawer::drawMainPlot(const PlotDrawer::PlotParameters& parameters)
-{
-    QPixmap& pixmap = parameters.pixmap;
-    pixmap = QPixmap{parameters.width, parameters.height};
-    QPainter painter {&pixmap};
-    pixmap.fill(parameters.background_color);
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(parameters.pen);
-
-    const auto& data = measurement_->data;
-    const auto& rarefaction = parameters.rarefaction;
-    const auto& first = parameters.first_point;
-    const auto& last = parameters.last_point;
-    const auto& delta_x = parameters.max_values.x() - parameters.min_values.x();
-    const auto& delta_y = parameters.max_values.y() - parameters.min_values.y();
-    const auto& x_coefficient = parameters.width / delta_x;
-    const auto& y_coefficient = parameters.height / delta_y;
-
-    for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
-        QPointF point1;
-        point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.min_values.x()));
-        point1.setY(y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y()));
-        QPointF point2;
-        point2.setX(x_coefficient * (data[i].x() - parameters.min_values.x()));
-        point2.setY(y_coefficient * (data[i].y() - parameters.min_values.y()));
-        painter.drawLine(point1, point2);
-    }
-}
-
 void PlotDrawer::drawPreview(int width, int height)
 {
     PlotParameters parameters {plot_preview_};
@@ -83,29 +54,21 @@ void PlotDrawer::drawPreview(int width, int height)
     drawPlot(parameters);
 }
 
-void PlotDrawer::drawPlot(qreal start_percent, qreal end_percent, int width, int height)
+void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, int height)
 {
     PlotParameters parameters {plot_};
     const auto& data = measurement_->data;
-    parameters.first_point = (data.size() * start_percent) / 100.;
-    if (parameters.first_point == 0) {
-        ++parameters.first_point;
-    }
-    parameters.last_point = (data.size() * end_percent) / 100.;
-    if (parameters.last_point >= data.size()) {
-        parameters.last_point = data.size() - 1;
-    }
+    parameters.first_point = first_point;
+    parameters.last_point = last_point;
     parameters.width = width;
     parameters.height = height;
     parameters.rarefaction = 1;
-    const auto& first_point = parameters.first_point;
-    const auto& last_point = parameters.last_point;
-    auto min_max_y = std::minmax_element(data.begin() + first_point, data.begin() + last_point,
+    auto min_max_y = std::minmax_element(data.begin() + parameters.first_point, data.begin() + parameters.last_point,
                                          [](const QPointF p1, const QPointF& p2){ return p1.y() < p2.y();});
     parameters.min_values = {data[first_point].x(), min_max_y.first->y()};
     parameters.max_values = {data[last_point].x(), min_max_y.second->y()};
 
-    drawMainPlot(parameters);
+    drawPlot(parameters);
 }
 
 const QPixmap &PlotDrawer::plot() const
