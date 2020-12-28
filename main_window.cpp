@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     data_read_progress_dialog_->close();
 
     ui_->previewPlotView->setScene(preview_scene_);
-    ui_->previewPlotView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    ui_->previewPlotView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui_->previewPlotView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+//    ui_->previewPlotView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui_->splitter->setSizes({10, 200});
     ui_->scrollArea->setWidget(plot_widget_);
 
@@ -146,17 +146,6 @@ void MainWindow::onPreviewViewSizeChanged(const QSize& size)
 
 void MainWindow::onFrameItemChanged(const QRectF& rect)
 {
-//    auto* frame_item = preview_scene_->frameItem();
-////    frame_item->setHeight(ui_->previewPlotView->height());
-//    Q_ASSERT(frame_item);
-//    qreal preview_width = ui_->previewPlotView->width();
-//    int first = (frame_item->x() * 100) / preview_width;
-//    int last = ((frame_item->x() + frame_item->width()) * 100) / preview_width;
-//    int plot_area_width = plot_widget_->width();
-//    int plot_area_height = plot_widget_->height();
-//    plot_drawer_.drawPlot(first, last, plot_area_width, plot_area_height);
-//    plot_widget_->drawArea(first, last);
-
     updatePlot();
 }
 
@@ -171,7 +160,7 @@ void MainWindow::onDataReadFinished()
     }
 
     measurement_ = file_reader_.takeMeasurement();
-    preview_scene_->frameItem()->setHeight(ui_->previewPlotView->height());
+    preview_scene_->resetFrameItem(ui_->previewPlotView->height(), ui_->previewPlotView->width());
     updatePreviewPlot();
     updatePlot();
 }

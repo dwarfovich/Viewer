@@ -34,6 +34,8 @@ public:
     const QPixmap& plot() const;
     const QPixmap& plotPreview() const;
     void setMeasurement(const Measurement *measurement);
+    const Measurement* measurement() const;
+
 
 private:
     const Measurement* measurement_;

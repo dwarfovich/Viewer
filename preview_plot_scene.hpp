@@ -19,6 +19,7 @@ public:
 
     PreviewPlotFrameItem *frameItem() const;
     void updatePreview(int width, int height);
+    void resetFrameItem(int height, int expected_scene_width);
 
 public slots:
     void onPlotScaleRequest(qreal angle_data);
@@ -27,17 +28,24 @@ signals:
     void frameItemChanged(const QRectF& rect);
     void frameItemPosChanged(const QPointF& new_pos);
 
-//private slots:
-//    void onFrameItemPosChanged(const QPointF& new_pos);
+private:
+    qreal minFrameWidth(int expected_scene_width) const;
+    qreal maxFrameWidth(int expected_scene_width) const;
 
 private:
     PlotDrawer& drawer_;
     QGraphicsPixmapItem* preview_item_;
     PreviewPlotFrameItem* frame_item_;
-    qreal x_scale = 1.0;
-    const qreal scale_delta = 0.1;
-    const qreal min_scale = 0.1;
-    const qreal max_scale = 1.5;
+    qreal x_scale_ = 100.;
+    const qreal scale_delta_ = 1.;
+    qreal min_scale_ = 0.1;
+    qreal max_scale_ = 1.5;
+    qreal normal_width_ = 0.;
+    qreal width_delta_ = 50.;
+    qreal min_frame_width_ = 0.;
+    qreal max_frame_width_ = 0.;
+    const size_t min_points_ = 100;
+    const size_t max_points_ = 10'000;
 };
 
 #endif // PREVIEWPLOTSCENE_HPP

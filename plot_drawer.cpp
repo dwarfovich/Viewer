@@ -85,3 +85,8 @@ void PlotDrawer::setMeasurement(const Measurement *measurement)
 {
     measurement_ = measurement;
 }
+
+const Measurement* PlotDrawer::measurement() const
+{
+    return measurement_;
+}

@@ -29,10 +29,8 @@ void PlotWidget::paintEvent(QPaintEvent *event)
 
 void PlotWidget::drawArea(int first, int last)
 {
-//    drawer_.drawPlot(first, last, this->width(), this->height());
     drawer_.drawMainPlot(first, last, width(), height());
     plot_ = drawer_.plot();
-
     update();
 }
 
