@@ -36,16 +36,12 @@ private:
     PlotDrawer& drawer_;
     QGraphicsPixmapItem* preview_item_;
     PreviewPlotFrameItem* frame_item_;
-    qreal x_scale_ = 100.;
-    const qreal scale_delta_ = 1.;
-    qreal min_scale_ = 0.1;
-    qreal max_scale_ = 1.5;
     qreal normal_width_ = 0.;
     qreal width_delta_ = 50.;
     qreal min_frame_width_ = 0.;
     qreal max_frame_width_ = 0.;
-    const size_t min_points_ = 100;
-    const size_t max_points_ = 10'000;
+    const size_t min_frame_points_ = 100;
+    const size_t max_frame_points_ = 100'000;
 };
 
 #endif // PREVIEWPLOTSCENE_HPP

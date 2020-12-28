@@ -37,14 +37,9 @@ void PreviewPlotScene::resetFrameItem(int height, int expected_scene_width)
 {
     frame_item_->setHeight(height);
 
-    x_scale_ = 100.;
-    Q_ASSERT(drawer_.measurement());
-
     min_frame_width_ = minFrameWidth(expected_scene_width);
     max_frame_width_ = maxFrameWidth(expected_scene_width);
     normal_width_ = (max_frame_width_ + min_frame_width_) / 2.;
-    min_scale_ = min_frame_width_ * 100. / normal_width_;
-    max_scale_ = max_frame_width_ * 100. / normal_width_;
 
     frame_item_->setWidth(normal_width_);
     frame_item_->setX(0);
@@ -72,7 +67,7 @@ qreal PreviewPlotScene::minFrameWidth(int expected_scene_width) const
     const auto& measurement = *drawer_.measurement();
     const auto& data = measurement.data;
 
-    size_t first_point = std::min(min_points_, data.size());
+    size_t first_point = std::min(min_frame_points_, data.size() - 1);
     qreal first_point_x = data[first_point].x();
     qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
     qreal first_point_percent = (first_point_x - measurement.stats.min_x) * 100. / x_range;
@@ -86,7 +81,7 @@ qreal PreviewPlotScene::maxFrameWidth(int expected_scene_width) const
     const auto& measurement = *drawer_.measurement();
     const auto& data = measurement.data;
 
-    size_t last_point = std::min(max_points_, data.size() - 1);
+    size_t last_point = std::min(max_frame_points_, data.size() - 1);
     qreal last_point_x = data[last_point].x();
     qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
     qreal last_point_percent = (last_point_x - measurement.stats.min_x) * 100. / x_range;

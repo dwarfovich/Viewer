@@ -36,12 +36,15 @@ public:
     void setMeasurement(const Measurement *measurement);
     const Measurement* measurement() const;
 
+private:
+    size_t calculatePreviewRarefaction() const;
+    size_t calculateMainPlotRarefaction(size_t points) const;
 
 private:
     const Measurement* measurement_;
-    size_t default_rarefraction_ = 500;
     QPixmap plot_;
     QPixmap plot_preview_;
+    const size_t size_without_rarefaction = 5'000;
 };
 
 #endif // PLOTDRAWER_HPP
