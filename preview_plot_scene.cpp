@@ -30,7 +30,6 @@ void PreviewPlotScene::updatePreview(int width, int height)
 {
     drawer_.drawPreview(width, height);
     preview_item_->setPixmap(drawer_.plotPreview());
-    update();
 }
 
 void PreviewPlotScene::onPlotScaleRequest(qreal angle_data)

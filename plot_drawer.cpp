@@ -37,7 +37,6 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
         point2.setY(y_coefficient * (data[i].y() - parameters.min_values.y()));
         painter.drawLine(point1, point2);
     }
-
 }
 
 void PlotDrawer::drawPreview(int width, int height)

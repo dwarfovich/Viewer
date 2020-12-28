@@ -8,6 +8,7 @@ class QTextStream;
 
 struct Header
 {
+    QString filename;
     QString organization;
     QString application;
     QString measurement_type;

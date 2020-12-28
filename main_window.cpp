@@ -152,5 +152,6 @@ void MainWindow::onDataReadFinished()
     }
 
     measurement_ = file_reader_.takeMeasurement();
+    updatePreviewPlot();
     updatePlot();
 }

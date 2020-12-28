@@ -30,7 +30,6 @@ public:
     ~FileReader();
 
     void readFile(const QString& filename);
-    bool hasErrors() const;
     Measurement takeMeasurement();
     const QStringList& headerErrors() const;
     const QStringList& dataErrors() const;
@@ -50,7 +49,7 @@ private:
     void parseDuration(QString line);
     void parseParameters(const QStringList& header_lines, int first_parameters_line);
     void readData(QTextStream& input);
-    void clearMeasurement();
+    void clear();
 
     void printHeader() const;
 

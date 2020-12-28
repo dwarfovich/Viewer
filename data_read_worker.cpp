@@ -10,6 +10,7 @@ DataReadWorker::DataReadWorker()
 
 void DataReadWorker::read(const QString &text)
 {
+    stats_ = {};
     QTime timer;
     timer.start();
     data_.reserve(reserved_data_size_);

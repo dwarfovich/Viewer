@@ -32,7 +32,8 @@ void FileReader::readFile(const QString &filename)
 {
     QFile file {filename};
     if (file.open(QFile::ReadOnly)) {
-        clearMeasurement();
+        clear();
+        measurement_.header.filename = filename;
         QTextStream input {&file};
         const auto& header_lines = readHeaderLines(input);
         const auto& header_errors = parseHeaderLines(header_lines);
@@ -40,12 +41,8 @@ void FileReader::readFile(const QString &filename)
         readData(input);
     } else {
         data_errors_.push_back(tr("Cannot open file"));
+        emit finished();
     }
-}
-
-bool FileReader::hasErrors() const
-{
-    return false;
 }
 
 QStringList FileReader::readHeaderLines(QTextStream &input) const
@@ -144,14 +141,13 @@ void FileReader::readData(QTextStream &input)
     emit readingStarted(text);
 }
 
-void FileReader::clearMeasurement()
+void FileReader::clear()
 {
     measurement_.data.clear();
     measurement_.header.parameters.clear();
-    measurement_.stats.min_x = std::numeric_limits<double>::max();
-    measurement_.stats.max_x = 0.;
-    measurement_.stats.min_y = std::numeric_limits<double>::max();
-    measurement_.stats.max_y = 0.;
+    measurement_.stats = {};
+    header_errors_.clear();
+    data_errors_.clear();
 }
 
 void FileReader::printHeader() const
