@@ -90,11 +90,12 @@ void MainWindow::updatePlot()
     qreal first = (frame_item->x() * 100.) / preview_width;
     qreal last = ((frame_item->x() + frame_item->width()) * 100.) / preview_width;
     qreal x_range = measurement_.stats.max_x - measurement_.stats.min_x;
-    qreal last_x = (x_range * last) / 100. + measurement_.stats.min_x;
     qreal first_x = (x_range * first) / 100. + measurement_.stats.min_x;
+    qreal last_x = (x_range * last) / 100. + measurement_.stats.min_x;
     bool first_found = false;
     size_t first_point = 0;
     size_t last_point = 0;
+    DEB << "x" << first_x << last_x;
     for (size_t i = 0; i < measurement_.data.size(); ++i) {
         if (!first_found && measurement_.data[i].x() >= first_x) {
             first_point = i;
@@ -104,6 +105,9 @@ void MainWindow::updatePlot()
             last_point = i;
             break;
         }
+    }
+    if (last_point == 0) {
+        last_point = measurement_.data.size() - 1;
     }
     if (first_point == last_point && first_point != 0) {
         --first_point;
