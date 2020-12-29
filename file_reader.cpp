@@ -194,7 +194,7 @@ void FileReader::concatenateWorkersResults()
     std::sort(workers_data_.begin(), workers_data_.end(),
               [](const auto& v1, const auto& v2){ return v1[0].x() < v2[0].x(); });
     for (auto& data : workers_data_) {
-        measurement_.data.insert(measurement_.data.end(), data.begin(), data.end());
+            measurement_.data.insert(measurement_.data.end(), data.begin(), data.end());
     }
     for (const auto& stats : workers_stats_) {
         measurement_.stats.min_x = std::min(measurement_.stats.min_x, stats.min_x);
