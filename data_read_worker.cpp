@@ -53,6 +53,9 @@ void DataReadWorker::setReadParameters(int begin, int end)
 {
     begin_ = begin;
     end_ = end;
+//    if (begin == end) {
+//        data_.resize(1);
+//    }
 }
 
 std::vector<QPointF> DataReadWorker::takeData()

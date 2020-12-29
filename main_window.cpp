@@ -160,6 +160,8 @@ void MainWindow::onDataReadFinished()
     }
 
     measurement_ = file_reader_.takeMeasurement();
+    Q_ASSERT(!measurement_.data.empty());
+
     preview_scene_->resetFrameItem(ui_->previewPlotView->height(), ui_->previewPlotView->width());
     updatePreviewPlot();
     updatePlot();

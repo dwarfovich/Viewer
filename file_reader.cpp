@@ -191,8 +191,13 @@ void FileReader::quitThreads() const
 void FileReader::concatenateWorkersResults()
 {
     // TODO: Check for movement.
-    std::sort(workers_data_.begin(), workers_data_.end(),
-              [](const auto& v1, const auto& v2){ return v1[0].x() < v2[0].x(); });
+    std::sort(workers_data_.begin(), workers_data_.end(), [](const auto& v1, const auto& v2) {
+        if (v1.empty() || v2.empty()) {
+            return false;
+        } else {
+            return v1[0].x() < v2[0].x();
+        }
+    });
     for (auto& data : workers_data_) {
             measurement_.data.insert(measurement_.data.end(), data.begin(), data.end());
     }
