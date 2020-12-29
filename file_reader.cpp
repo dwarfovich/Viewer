@@ -15,10 +15,9 @@
 FileReader::FileReader()
 {
     int thread_count = QThread::idealThreadCount();
-//    int thread_count = 8;
     threads_.reserve(thread_count);
     workers_.reserve(thread_count);
-    for (size_t i = 0; i < thread_count; ++i) {
+    for (int i = 0; i < thread_count; ++i) {
         threads_.push_back(std::make_unique<QThread>());
         workers_.push_back(std::make_unique<DataReadWorker>());
         connect(workers_[i].get(), &DataReadWorker::finished, this, &FileReader::onWorkerFinished);
@@ -164,7 +163,6 @@ void FileReader::readData(QTextStream &input)
             if (end_of_line == -1) {
                 end_of_line = text.size();
             }
-            DEB << "thread" << i << ":" << begin << end_of_line;
             workers_[i]->setReadParameters(begin, end_of_line);
             begin = end_of_line + 1;
         }
@@ -186,6 +184,7 @@ void FileReader::quitThreads() const
 {
     for (auto& thread : threads_) {
         thread->quit();
+        thread->wait();
     }
 }
 
@@ -226,15 +225,13 @@ void FileReader::onWorkerFinished()
     } else {
         Q_ASSERT(false);
     }
+
     ++jobs_done_;
     if (jobs_done_ == workers_.size()) {
         concatenateWorkersResults();
-        DEB << "RRRESULT:" << measurement_.data.size();
+        DEB << "Result data size:" << measurement_.data.size();
         emit finished();
     }
-//    measurement_.data = worker_->takeData();
-//    measurement_.stats = worker_->takeStats();
-//    emit finished();
 }
 
 const QStringList &FileReader::dataErrors() const

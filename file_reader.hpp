@@ -52,7 +52,7 @@ private:
     void clear();
     void quitThreads() const;
     void concatenateWorkersResults();
-
+    void setupThreads(const QString& text_for_parsing);
     void printHeader() const;
 
 private slots:
