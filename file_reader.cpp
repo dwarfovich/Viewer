@@ -13,19 +13,28 @@
 #define DEB qDebug()
 
 FileReader::FileReader()
-//    : worker_thread_{new QThread {}}
 {
-    worker_ = std::make_unique<DataReadWorker>();
-    worker_->moveToThread(&worker_thread_);
-    connect(worker_.get(), &DataReadWorker::finished, this, &FileReader::getWorkerResults);
-    connect(worker_.get(), &DataReadWorker::progressChanged, this, &FileReader::progressChanged);
-    worker_thread_.start();
-    connect(this, &FileReader::readingStarted, worker_.get(), &DataReadWorker::read);
+    int thread_count = QThread::idealThreadCount();
+//    int thread_count = 8;
+    threads_.reserve(thread_count);
+    workers_.reserve(thread_count);
+    for (size_t i = 0; i < thread_count; ++i) {
+        threads_.push_back(std::make_unique<QThread>());
+        workers_.push_back(std::make_unique<DataReadWorker>());
+        connect(workers_[i].get(), &DataReadWorker::finished, this, &FileReader::onWorkerFinished);
+        connect(this, &FileReader::readingStarted, workers_[i].get(), &DataReadWorker::read);
+        workers_[i]->moveToThread(threads_[i].get());
+    }
+    connect(workers_[0].get(), &DataReadWorker::progressChanged, this, &FileReader::progressChanged);
+
+    for (auto& thread : threads_) {
+        thread->start();
+    }
 }
 
 FileReader::~FileReader()
 {
-    worker_thread_.quit();
+    quitThreads();
 }
 
 void FileReader::readFile(const QString &filename)
@@ -40,7 +49,7 @@ void FileReader::readFile(const QString &filename)
         header_errors_.append(header_errors);
         readData(input);
     } else {
-        data_errors_.push_back(tr("Cannot open file"));
+        data_errors_.push_back(tr("Cannot open file ") + filename);
         emit finished();
     }
 }
@@ -137,7 +146,30 @@ void FileReader::parseParameters(const QStringList &header_lines, int first_para
 
 void FileReader::readData(QTextStream &input)
 {
+    workers_data_.clear();
+    workers_stats_.clear();
+    jobs_done_ = 0;
     QString text = input.readAll();
+    if (text.size() < multithreading_text_size) {
+        workers_[0]->setReadParameters(0, text.size());
+        threads_[0]->start();
+        for (size_t i = 1; i < threads_.size(); ++i) {
+            workers_[i]->setReadParameters(0, 0);
+        }
+    } else {
+        int size_per_thread = text.size() / threads_.size();
+        int begin = 0;
+        for (size_t i = 0; i < threads_.size(); ++i) {
+            int end_of_line = text.indexOf('\n', size_per_thread * (i + 1));
+            if (end_of_line == -1) {
+                end_of_line = text.size();
+            }
+            DEB << "thread" << i << ":" << begin << end_of_line;
+            workers_[i]->setReadParameters(begin, end_of_line);
+            begin = end_of_line + 1;
+        }
+    }
+
     emit readingStarted(text);
 }
 
@@ -148,6 +180,29 @@ void FileReader::clear()
     measurement_.stats = {};
     header_errors_.clear();
     data_errors_.clear();
+}
+
+void FileReader::quitThreads() const
+{
+    for (auto& thread : threads_) {
+        thread->quit();
+    }
+}
+
+void FileReader::concatenateWorkersResults()
+{
+    // TODO: Check for movement.
+    std::sort(workers_data_.begin(), workers_data_.end(),
+              [](const auto& v1, const auto& v2){ return v1[0].x() < v2[0].x(); });
+    for (auto& data : workers_data_) {
+        measurement_.data.insert(measurement_.data.end(), data.begin(), data.end());
+    }
+    for (const auto& stats : workers_stats_) {
+        measurement_.stats.min_x = std::min(measurement_.stats.min_x, stats.min_x);
+        measurement_.stats.min_y = std::min(measurement_.stats.min_y, stats.min_y);
+        measurement_.stats.max_x = std::max(measurement_.stats.max_x, stats.max_x);
+        measurement_.stats.max_y = std::max(measurement_.stats.max_y, stats.max_y);
+    }
 }
 
 void FileReader::printHeader() const
@@ -162,11 +217,24 @@ void FileReader::printHeader() const
     }
 }
 
-void FileReader::getWorkerResults()
+void FileReader::onWorkerFinished()
 {
-    measurement_.data = worker_->takeData();
-    measurement_.stats = worker_->takeStats();
-    emit finished();
+    auto* worker = qobject_cast<DataReadWorker*>(sender());
+    if (worker) {
+        workers_data_.push_back(worker->takeData());
+        workers_stats_.push_back(worker->takeStats());
+    } else {
+        Q_ASSERT(false);
+    }
+    ++jobs_done_;
+    if (jobs_done_ == workers_.size()) {
+        concatenateWorkersResults();
+        DEB << "RRRESULT:" << measurement_.data.size();
+        emit finished();
+    }
+//    measurement_.data = worker_->takeData();
+//    measurement_.stats = worker_->takeStats();
+//    emit finished();
 }
 
 const QStringList &FileReader::dataErrors() const

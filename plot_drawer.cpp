@@ -39,15 +39,15 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
         painter.drawLine(point1, point2);
         ++count;
     }
-    if (&parameters.pixmap == &plot_preview_) {
-        DEB << "Plot preview:";
-        DEB << "Rarefaction:" << parameters.rarefaction;
-        DEB << "Points drawn:" << count;
-    } else {
-        DEB << "Plot main:";
-        DEB << "Rarefaction:" << parameters.rarefaction;
-        DEB << "Points drawn:" << count;
-    }
+//    if (&parameters.pixmap == &plot_preview_) {
+//        DEB << "Plot preview:";
+//        DEB << "Rarefaction:" << parameters.rarefaction;
+//        DEB << "Points drawn:" << count;
+//    } else {
+//        DEB << "Plot main:";
+//        DEB << "Rarefaction:" << parameters.rarefaction;
+//        DEB << "Points drawn:" << count;
+//    }
 }
 
 void PlotDrawer::drawPreview(int width, int height)

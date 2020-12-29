@@ -50,19 +50,25 @@ private:
     void parseParameters(const QStringList& header_lines, int first_parameters_line);
     void readData(QTextStream& input);
     void clear();
+    void quitThreads() const;
+    void concatenateWorkersResults();
 
     void printHeader() const;
 
 private slots:
-    void getWorkerResults();
+    void onWorkerFinished();
 
 private:
-    QThread worker_thread_;
-    std::unique_ptr<DataReadWorker> worker_;
+    std::vector<std::unique_ptr<QThread>> threads_;
+    std::vector<std::unique_ptr<DataReadWorker>> workers_;
     Measurement measurement_;
     QStringList header_errors_;
     QStringList data_errors_;
     const QChar header_line_starter_ = '#';
+    const int multithreading_text_size = 100'000;
+    size_t jobs_done_ = 0;
+    std::vector<std::vector<QPointF>> workers_data_;
+    std::vector<DataStats> workers_stats_;
 };
 
 #endif // FILEREADER_HPP

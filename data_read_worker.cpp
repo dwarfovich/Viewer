@@ -11,11 +11,15 @@ DataReadWorker::DataReadWorker()
 void DataReadWorker::read(const QString &text)
 {
     stats_ = {};
+    if (begin_ == end_) {
+        emit finished();
+        return;
+    }
     QTime timer;
     timer.start();
     data_.reserve(reserved_data_size_);
     int progress_step = 0;
-    for (int first = 0; first < text.size() - 1;) {
+    for (int first = begin_; first < end_;) {
         // first value
         int delimiter_pos = text.indexOf(' ', first);
         QStringRef first_value (&text, first, delimiter_pos - first);
@@ -43,6 +47,12 @@ void DataReadWorker::read(const QString &text)
     DEB << "Data size:" << data_.size();
 
     emit finished();
+}
+
+void DataReadWorker::setReadParameters(int begin, int end)
+{
+    begin_ = begin;
+    end_ = end;
 }
 
 std::vector<QPointF> DataReadWorker::takeData()

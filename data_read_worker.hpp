@@ -14,6 +14,7 @@ public:
     DataReadWorker();
 
     void read(const QString& text);
+    void setReadParameters(int begin, int end);
     std::vector<QPointF> takeData();
     DataStats takeStats();
 
@@ -27,6 +28,8 @@ private:
 private:
     std::vector<QPointF> data_;
     DataStats stats_;
+    int begin_ = 0;
+    int end_ = 0;
     size_t reserved_data_size_ = 5'000'000;
     const int steps_per_progress_ = 100'000;
 };
