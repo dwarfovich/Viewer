@@ -21,7 +21,6 @@ class FileReader : public QObject
         OrganizationAndApp = 0,
         MeasurementType,
         StartTime,
-        Duration,
         Parameters
     };
 
@@ -46,7 +45,6 @@ private:
     void parseOrganiationAndApp(QString line);
     void parseMeasurementType(QString line);
     void parseStartTime(QString line);
-    void parseDuration(QString line);
     void parseParameters(const QStringList& header_lines, int first_parameters_line);
     void readData(QTextStream& input);
     void clear();

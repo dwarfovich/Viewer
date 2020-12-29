@@ -11,6 +11,7 @@ CONFIG += c++2a
 SOURCES += \
     data_read_worker.cpp \
     data_stats.cpp \
+    file_info_widget.cpp \
     file_reader.cpp \
     header.cpp \
     main.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
 HEADERS += \
     data_read_worker.hpp \
     data_stats.hpp \
+    file_info_widget.hpp \
     file_reader.hpp \
     header.hpp \
     main_window.hpp \
@@ -36,6 +38,7 @@ HEADERS += \
     preview_plot_view.hpp
 
 FORMS += \
+    file_info_widget.ui \
     main_window.ui
 
 # Default rules for deployment.

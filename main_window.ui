@@ -31,7 +31,7 @@
           <x>0</x>
           <y>0</y>
           <width>776</width>
-          <height>278</height>
+          <height>83</height>
          </rect>
         </property>
        </widget>
@@ -53,6 +53,7 @@
     <property name="title">
      <string>Main</string>
     </property>
+    <addaction name="actionFileInfo"/>
     <addaction name="actionLoad"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
@@ -68,6 +69,11 @@
   <action name="actionQuit">
    <property name="text">
     <string>Quit</string>
+   </property>
+  </action>
+  <action name="actionFileInfo">
+   <property name="text">
+    <string>File info</string>
    </property>
   </action>
  </widget>

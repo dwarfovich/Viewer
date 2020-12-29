@@ -30,6 +30,7 @@ public slots:
     void onPreviewFrameItemPosChanged();
     void updatePreviewPlot();
     void updatePlot();
+    void showFileInfo();
 
 private:
     int showReadingErrorsMessage(const FileReader& reader) const;

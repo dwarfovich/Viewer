@@ -81,9 +81,6 @@ QStringList FileReader::parseHeaderLines(const QStringList &lines)
     if (lines.size() > HeaderLines::StartTime) {
         parseStartTime(lines[HeaderLines::StartTime]);
     }
-    if (lines.size() > HeaderLines::Duration) {
-        parseDuration(lines[HeaderLines::Duration]);
-    }
     if (lines.size() > HeaderLines::Parameters) {
         parseParameters(lines, HeaderLines::Parameters);
     }
@@ -127,11 +124,6 @@ void FileReader::parseStartTime(QString line)
     } else{
         measurement_.header.start_time = locale.toDateTime(line, time_format);
     }
-}
-
-void FileReader::parseDuration(QString line)
-{
-    measurement_.header.duration = line;
 }
 
 void FileReader::parseParameters(const QStringList &header_lines, int first_parameters_line)

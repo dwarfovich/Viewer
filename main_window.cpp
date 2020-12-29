@@ -6,6 +6,7 @@
 #include "plot_widget.hpp"
 #include "preview_plot_frame_item.hpp"
 #include "preview_plot_scene.hpp"
+#include "file_info_widget.hpp"
 
 #include <QProgressDialog>
 #include <QAction>
@@ -51,8 +52,10 @@ MainWindow::MainWindow(QWidget *parent)
     connect(&file_reader_, &FileReader::progressChanged,
             data_read_progress_dialog_, &QProgressDialog::setValue);
 
+    connect(ui_->actionFileInfo, &QAction::triggered, this, &MainWindow::showFileInfo);
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
     connect(ui_->actionQuit, &QAction::triggered, this, &MainWindow::close);
+
 
     resize(1400, 900);
     show();
@@ -116,6 +119,14 @@ void MainWindow::updatePlot()
         }
     }
     plot_widget_->drawArea(first_point, last_point);
+}
+
+void MainWindow::showFileInfo()
+{
+    auto* widget = new FileInfoWidget {nullptr, Qt::Window};
+    widget->setAttribute(Qt::WA_DeleteOnClose);
+    widget->setMeasurement(&measurement_);
+    widget->show();
 }
 
 int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
