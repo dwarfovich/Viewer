@@ -32,11 +32,10 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
     for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
         QPointF point1;
         point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.min_values.x()));
-        point1.setY(y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y()));
+        point1.setY(parameters.height - (y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y())));
         QPointF point2;
-//        //         TODO: Инвертировать значения по y
         point2.setX(x_coefficient * (data[i].x() - parameters.min_values.x()));
-        point2.setY(y_coefficient * (data[i].y() - parameters.min_values.y()));
+        point2.setY(parameters.height - (y_coefficient * (data[i].y() - parameters.min_values.y())));
         painter.drawLine(point1, point2);
 
         last_point = i;
@@ -45,10 +44,10 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
     if (last_point != last) {
         QPointF point1;
         point1.setX(x_coefficient * (data[last_point - rarefaction].x() - parameters.min_values.x()));
-        point1.setY(y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y()));
+        point1.setY(parameters.height - (y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y())));
         QPointF point2;
         point2.setX(x_coefficient * (data[last].x() - parameters.min_values.x()));
-        point2.setY(y_coefficient * (data[last].y() - parameters.min_values.y()));
+        point2.setY(parameters.height - (y_coefficient * (data[last].y() - parameters.min_values.y())));
         painter.drawLine(point1, point2);
     }
 
