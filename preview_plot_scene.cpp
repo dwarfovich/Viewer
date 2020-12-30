@@ -4,7 +4,7 @@
 #include "measurement.hpp"
 
 #include <QGraphicsPixmapItem>
-#include <QGraphicsSceneWheelEvent>
+#include <QGraphicsSceneMouseEvent>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -88,4 +88,14 @@ qreal PreviewPlotScene::maxFrameWidth(int expected_scene_width) const
     qreal max_width = expected_scene_width * last_point_percent / 100.;
 
     return max_width;
+}
+
+
+void PreviewPlotScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+{
+    if (!frame_item_->mapToScene(frame_item_->boundingRect()).containsPoint(event->scenePos(), Qt::OddEvenFill)) {
+        frame_item_->setPos(event->scenePos());
+    } else {
+        QGraphicsScene::mousePressEvent(event);
+    }
 }

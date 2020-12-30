@@ -28,6 +28,9 @@ signals:
     void frameItemChanged(const QRectF& rect);
     void frameItemPosChanged(const QPointF& new_pos);
 
+protected:
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
+
 private:
     qreal minFrameWidth(int expected_scene_width) const;
     qreal maxFrameWidth(int expected_scene_width) const;
@@ -36,7 +39,7 @@ private:
     PlotDrawer& drawer_;
     QGraphicsPixmapItem* preview_item_;
     PreviewPlotFrameItem* frame_item_;
-    qreal normal_width_ = 0.;
+    qreal normal_width_ = 50.;
     qreal width_delta_ = 50.;
     qreal min_frame_width_ = 0.;
     qreal max_frame_width_ = 0.;
