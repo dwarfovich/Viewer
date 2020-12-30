@@ -98,7 +98,6 @@ void MainWindow::updatePlot()
     bool first_found = false;
     size_t first_point = 0;
     size_t last_point = 0;
-    DEB << "x" << first_x << last_x;
     for (size_t i = 0; i < measurement_.data.size(); ++i) {
         if (!first_found && measurement_.data[i].x() >= first_x) {
             first_point = i;

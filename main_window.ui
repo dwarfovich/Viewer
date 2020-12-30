@@ -53,9 +53,9 @@
     <property name="title">
      <string>Main</string>
     </property>
-    <addaction name="actionFileInfo"/>
     <addaction name="actionLoad"/>
     <addaction name="separator"/>
+    <addaction name="actionFileInfo"/>
     <addaction name="actionQuit"/>
    </widget>
    <addaction name="menuMain"/>

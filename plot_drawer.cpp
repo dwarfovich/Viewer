@@ -27,7 +27,8 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
     const auto& delta_y = parameters.max_values.y() - parameters.min_values.y();
     const auto& x_coefficient = parameters.width / delta_x;
     const auto& y_coefficient = parameters.height / delta_y;
-    int count = 0;
+
+    size_t last_point = 0;
     for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
         QPointF point1;
         point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.min_values.x()));
@@ -37,16 +38,22 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
         point2.setX(x_coefficient * (data[i].x() - parameters.min_values.x()));
         point2.setY(y_coefficient * (data[i].y() - parameters.min_values.y()));
         painter.drawLine(point1, point2);
-        ++count;
+
+        last_point = i;
     }
-//    if (&parameters.pixmap == &plot_preview_) {
-//        DEB << "Plot preview:";
-//        DEB << "Rarefaction:" << parameters.rarefaction;
-//        DEB << "Points drawn:" << count;
-//    } else {
-//        DEB << "Plot main:";
-//        DEB << "Rarefaction:" << parameters.rarefaction;
-//        DEB << "Points drawn:" << count;
+
+    if (last_point != last) {
+        QPointF point1;
+        point1.setX(x_coefficient * (data[last_point - rarefaction].x() - parameters.min_values.x()));
+        point1.setY(y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y()));
+        QPointF point2;
+        point2.setX(x_coefficient * (data[last].x() - parameters.min_values.x()));
+        point2.setY(y_coefficient * (data[last].y() - parameters.min_values.y()));
+        painter.drawLine(point1, point2);
+    }
+
+//    if(&parameters.pixmap == &plot_) {
+//        DEB << p << parameters.width;
 //    }
 }
 
