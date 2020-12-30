@@ -50,10 +50,6 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
         point2.setY(parameters.height - (y_coefficient * (data[last].y() - parameters.min_values.y())));
         painter.drawLine(point1, point2);
     }
-
-//    if(&parameters.pixmap == &plot_) {
-//        DEB << p << parameters.width;
-//    }
 }
 
 void PlotDrawer::drawPreview(int width, int height)
@@ -87,7 +83,7 @@ void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, 
     parameters.max_values = {data[last_point].x(), min_max_y.second->y()};
     range_x = {data[first_point].x(), data[last_point].x()};
     range_y = {min_max_y.first->y(), min_max_y.second->y()};
-
+    main_plot_points_range = {first_point, last_point};
     drawPlot(parameters);
 }
 
@@ -128,6 +124,11 @@ size_t PlotDrawer::calculateMainPlotRarefaction(size_t points) const
     } else {
         return (points / size_without_rarefaction);
     }
+}
+
+const std::pair<size_t, size_t>& PlotDrawer::mainPlotPointsRange() const
+{
+    return main_plot_points_range;
 }
 
 const std::pair<qreal, qreal>& PlotDrawer::rangeY() const

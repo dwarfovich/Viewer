@@ -39,6 +39,7 @@ private slots:
     void onPreviewViewSizeChanged(const QSize& size);
     void onFrameItemChanged(const QRectF& rect);
     void onDataReadFinished();
+    void onPlotWidgetPointChanged(size_t point, const QPointF& value);
 
 private:
     Measurement measurement_;

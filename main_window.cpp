@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
             ui_->verticalRulerWidget, &RulerWidget::setRange);
     connect(plot_widget_, &PlotWidget::horizontalRangeChanged,
             ui_->horizontalRulerWidget, &RulerWidget::setRange);
+    connect(plot_widget_, &PlotWidget::selectedPointChanged,
+            this, &MainWindow::onPlotWidgetPointChanged);
+
 
     connect(ui_->actionFileInfo, &QAction::triggered, this, &MainWindow::showFileInfo);
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);
@@ -186,4 +189,12 @@ void MainWindow::onDataReadFinished()
     preview_scene_->resetFrameItem(ui_->previewPlotView->height(), ui_->previewPlotView->width());
     updatePreviewPlot();
     updatePlot();
+}
+
+void MainWindow::onPlotWidgetPointChanged(size_t point, const QPointF& value)
+{
+    auto* bar = statusBar();
+    QString text = tr("Point [") + QString::number(point) + tr("]: ");
+    text += "(" + QString::number(value.x()) + "; " + QString::number(value.y()) + ")";
+    bar->showMessage(text);
 }

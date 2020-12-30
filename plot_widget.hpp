@@ -17,17 +17,18 @@ class PlotWidget : public QWidget
 public:
     PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
-    void setPlot(const QPixmap &plot);
     void drawArea(int first_point, int last_point);
 
 signals:
     void scaleChangeRequest(qreal angle_delta);
     void horizontalRangeChanged(const std::pair<qreal, qreal>& range);
     void verticalRangeChanged(const std::pair<qreal, qreal>& range);
+    void selectedPointChanged(size_t point, const QPointF& value);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
 
 private:
     PlotDrawer& drawer_;

@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QPaintEvent>
 #include <QWheelEvent>
+#include <QMouseEvent>
 
 #include <QDebug>
 #define DEB qDebug()
@@ -13,12 +14,7 @@ PlotWidget::PlotWidget(PlotDrawer &drawer, QWidget *parent)
     , drawer_{drawer}
 {
     setLayout(new QHBoxLayout {this});
-}
-
-void PlotWidget::setPlot(const QPixmap &plot)
-{
-    plot_ = plot;
-    update();
+    setMouseTracking(true);
 }
 
 void PlotWidget::paintEvent(QPaintEvent *event)
@@ -41,4 +37,15 @@ void PlotWidget::wheelEvent(QWheelEvent *event)
     emit scaleChangeRequest(event->angleDelta().y());
 
     event->accept();
+}
+
+void PlotWidget::mouseMoveEvent(QMouseEvent* event)
+{
+    const auto& points_range = drawer_.mainPlotPointsRange();
+    qreal current_x_percent = qreal(event->pos().x()) * 100. / qreal(width());
+    size_t current_point = (points_range.second - points_range.first) * current_x_percent / 100. + points_range.first;
+    const auto& data = drawer_.measurement()->data;
+    if (current_point < data.size()) {
+        emit selectedPointChanged(current_point, data[current_point]);
+    }
 }
