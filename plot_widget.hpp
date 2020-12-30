@@ -22,6 +22,8 @@ public:
 
 signals:
     void scaleChangeRequest(qreal angle_delta);
+    void horizontalRangeChanged(const std::pair<qreal, qreal>& range);
+    void verticalRangeChanged(const std::pair<qreal, qreal>& range);
 
 protected:
     void wheelEvent(QWheelEvent *event) override;

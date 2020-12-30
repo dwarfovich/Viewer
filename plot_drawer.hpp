@@ -35,6 +35,8 @@ public:
     const QPixmap& plotPreview() const;
     void setMeasurement(const Measurement *measurement);
     const Measurement* measurement() const;
+    const std::pair<qreal, qreal>& rangeX() const;
+    const std::pair<qreal, qreal>& rangeY() const;
 
 private:
     size_t calculatePreviewRarefaction() const;
@@ -44,6 +46,8 @@ private:
     const Measurement* measurement_;
     QPixmap plot_;
     QPixmap plot_preview_;
+    std::pair<qreal, qreal> range_x = {0., 0.};
+    std::pair<qreal, qreal> range_y = {0., 0.};
     const size_t size_without_rarefaction = 5'000;
 };
 

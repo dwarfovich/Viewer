@@ -37,6 +37,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     plot_drawer_.setMeasurement(&measurement_);
 
+    ui_->verticalRulerWidget->setOrientation(Qt::Vertical);
+    ui_->horizontalRulerWidget->setOrientation(Qt::Horizontal);
+
     connect(preview_scene_, &PreviewPlotScene::frameItemPosChanged,
             this, &MainWindow::onPreviewFrameItemPosChanged);
     connect(ui_->previewPlotView, &PreviewPlotView::sizeChanged,
@@ -51,6 +54,10 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::onDataReadFinished);
     connect(&file_reader_, &FileReader::progressChanged,
             data_read_progress_dialog_, &QProgressDialog::setValue);
+    connect(plot_widget_, &PlotWidget::verticalRangeChanged,
+            ui_->verticalRulerWidget, &RulerWidget::setRange);
+    connect(plot_widget_, &PlotWidget::horizontalRangeChanged,
+            ui_->horizontalRulerWidget, &RulerWidget::setRange);
 
     connect(ui_->actionFileInfo, &QAction::triggered, this, &MainWindow::showFileInfo);
     connect(ui_->actionLoad, &QAction::triggered, this, &MainWindow::loadFile);

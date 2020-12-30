@@ -43,8 +43,8 @@ void DataReadWorker::read(const QString &text)
     }
 
     qreal secs = timer.elapsed() / qreal(1000);
-    DEB << "Parsing time: " << secs;
-    DEB << "Data size:" << data_.size();
+//    DEB << "Parsing time: " << secs;
+//    DEB << "Data size:" << data_.size();
 
     emit finished();
 }
@@ -53,9 +53,6 @@ void DataReadWorker::setReadParameters(int begin, int end)
 {
     begin_ = begin;
     end_ = end;
-//    if (begin == end) {
-//        data_.resize(1);
-//    }
 }
 
 std::vector<QPointF> DataReadWorker::takeData()

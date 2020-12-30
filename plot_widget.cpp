@@ -27,11 +27,13 @@ void PlotWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(QPoint{0, 0}, plot_);
 }
 
-void PlotWidget::drawArea(int first, int last)
+void PlotWidget::drawArea(int first_point, int last_point)
 {
-    drawer_.drawMainPlot(first, last, width(), height());
+    drawer_.drawMainPlot(first_point, last_point, width(), height());
     plot_ = drawer_.plot();
     update();
+    emit horizontalRangeChanged(drawer_.rangeX());
+    emit verticalRangeChanged(drawer_.rangeY());
 }
 
 void PlotWidget::wheelEvent(QWheelEvent *event)

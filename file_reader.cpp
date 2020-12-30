@@ -226,7 +226,7 @@ void FileReader::onWorkerFinished()
     ++jobs_done_;
     if (jobs_done_ == workers_.size()) {
         concatenateWorkersResults();
-        DEB << "Result data size:" << measurement_.data.size();
+//        DEB << "Result data size:" << measurement_.data.size();
         emit finished();
     }
 }

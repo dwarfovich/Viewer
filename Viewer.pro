@@ -21,7 +21,8 @@ SOURCES += \
     plot_widget.cpp \
     preview_plot_frame_item.cpp \
     preview_plot_scene.cpp \
-    preview_plot_view.cpp
+    preview_plot_view.cpp \
+    ruler_widget.cpp
 
 HEADERS += \
     data_read_worker.hpp \
@@ -35,7 +36,9 @@ HEADERS += \
     plot_widget.hpp \
     preview_plot_frame_item.hpp \
     preview_plot_scene.hpp \
-    preview_plot_view.hpp
+    preview_plot_view.hpp \
+    ruler_widget.hpp \
+    tick_parameters.hpp
 
 FORMS += \
     file_info_widget.ui \

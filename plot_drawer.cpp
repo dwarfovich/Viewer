@@ -85,6 +85,8 @@ void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, 
                                          [](const QPointF p1, const QPointF& p2){ return p1.y() < p2.y();});
     parameters.min_values = {data[first_point].x(), min_max_y.first->y()};
     parameters.max_values = {data[last_point].x(), min_max_y.second->y()};
+    range_x = {data[first_point].x(), data[last_point].x()};
+    range_y = {min_max_y.first->y(), min_max_y.second->y()};
 
     drawPlot(parameters);
 }
@@ -126,4 +128,14 @@ size_t PlotDrawer::calculateMainPlotRarefaction(size_t points) const
     } else {
         return (points / size_without_rarefaction);
     }
+}
+
+const std::pair<qreal, qreal>& PlotDrawer::rangeY() const
+{
+    return range_y;
+}
+
+const std::pair<qreal, qreal>& PlotDrawer::rangeX() const
+{
+    return range_x;
 }
