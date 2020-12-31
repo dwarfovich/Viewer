@@ -64,30 +64,31 @@ void PreviewPlotScene::onPlotScaleRequest(qreal angle_delta)
 
 qreal PreviewPlotScene::minFrameWidth(int expected_scene_width) const
 {
-    const auto& measurement = *drawer_.measurement();
-    const auto& data = measurement.data;
-
+    const auto& data = drawer_.measurement()->data;
     size_t first_point = std::min(min_frame_points_, data.size() - 1);
-    qreal first_point_x = data[first_point].x();
-    qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
-    qreal first_point_percent = (first_point_x - measurement.stats.min_x) * 100. / x_range;
-    qreal min_width = expected_scene_width * first_point_percent / 100.;
+    qreal min_width = expected_scene_width * xPercentAtPoint(first_point) / 100.;
 
     return min_width;
 }
 
 qreal PreviewPlotScene::maxFrameWidth(int expected_scene_width) const
 {
-    const auto& measurement = *drawer_.measurement();
-    const auto& data = measurement.data;
-
+    const auto& data = drawer_.measurement()->data;
     size_t last_point = std::min(max_frame_points_, data.size() - 1);
-    qreal last_point_x = data[last_point].x();
-    qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
-    qreal last_point_percent = (last_point_x - measurement.stats.min_x) * 100. / x_range;
-    qreal max_width = expected_scene_width * last_point_percent / 100.;
+    qreal max_width = expected_scene_width * xPercentAtPoint(last_point) / 100.;
 
     return max_width;
+}
+
+qreal PreviewPlotScene::xPercentAtPoint(size_t point) const
+{
+    const auto& measurement = *drawer_.measurement();
+    const auto& data = measurement.data;
+    qreal point_x = data[point].x();
+    qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
+    qreal point_percent = (point_x - measurement.stats.min_x) * 100. / x_range;
+
+    return point_percent;
 }
 
 

@@ -2,6 +2,7 @@
 #define PREVIEWPLOTFRAMEITEM_HPP
 
 #include <QGraphicsObject>
+#include <QBrush>
 
 class PreviewPlotFrameItem : public QGraphicsObject
 {
@@ -29,6 +30,8 @@ protected:
 private:
     int width_ = 100;
     int height_ = 100;
+    QBrush brush_;
+    const QColor brush_color_ = {128, 128, 128, 128};
 };
 
 #endif // PREVIEWPLOTFRAMEITEM_HPP

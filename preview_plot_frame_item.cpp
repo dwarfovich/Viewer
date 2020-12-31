@@ -13,6 +13,9 @@ PreviewPlotFrameItem::PreviewPlotFrameItem(QGraphicsItem *parent)
     setFlag(QGraphicsItem::ItemIsSelectable, true);
     setFlag(QGraphicsItem::ItemIsMovable, true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges, true);
+
+    brush_.setStyle(Qt::SolidPattern);
+    brush_.setColor(brush_color_);
 }
 
 int PreviewPlotFrameItem::type() const
@@ -27,10 +30,7 @@ QRectF PreviewPlotFrameItem::boundingRect() const
 
 void PreviewPlotFrameItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    QBrush brush;
-    brush.setStyle(Qt::SolidPattern);
-    brush.setColor({128, 128, 128, 128});
-    painter->fillRect(0, 0, width_, height_, brush);
+    painter->fillRect(0, 0, width_, height_, brush_);
 }
 
 int PreviewPlotFrameItem::width() const

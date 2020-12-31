@@ -34,6 +34,7 @@ protected:
 private:
     qreal minFrameWidth(int expected_scene_width) const;
     qreal maxFrameWidth(int expected_scene_width) const;
+    qreal xPercentAtPoint(size_t point) const;
 
 private:
     PlotDrawer& drawer_;
