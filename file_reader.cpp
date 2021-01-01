@@ -1,7 +1,7 @@
 #include "file_reader.hpp"
 #include "measurement.hpp"
 #include "header.hpp"
-#include "data_read_worker.hpp"
+#include "data_parse_worker.hpp"
 
 #include <QTextStream>
 #include <QFile>
@@ -9,27 +9,8 @@
 
 #include <algorithm>
 
-#include <QDebug>
-#define DEB qDebug()
-
 FileReader::FileReader()
-{
-    int thread_count = QThread::idealThreadCount();
-    threads_.reserve(thread_count);
-    workers_.reserve(thread_count);
-    for (int i = 0; i < thread_count; ++i) {
-        threads_.push_back(std::make_unique<QThread>());
-        workers_.push_back(std::make_unique<DataReadWorker>());
-        connect(workers_[i].get(), &DataReadWorker::finished, this, &FileReader::onWorkerFinished);
-        connect(this, &FileReader::readingStarted, workers_[i].get(), &DataReadWorker::read);
-        workers_[i]->moveToThread(threads_[i].get());
-    }
-    connect(workers_[0].get(), &DataReadWorker::progressChanged, this, &FileReader::progressChanged);
-
-    for (auto& thread : threads_) {
-        thread->start();
-    }
-}
+{}
 
 FileReader::~FileReader()
 {
@@ -97,7 +78,7 @@ bool FileReader::isHeaderLine(const QString &line) const
     return (line.front() == header_line_starter_);
 }
 
-void FileReader::parseOrganiationAndApp(QString line)
+void FileReader::parseOrganiationAndApp(const QString& line)
 {
     int organization_delimiter_pos = line.indexOf(',');
     if (organization_delimiter_pos == -1){
@@ -109,12 +90,12 @@ void FileReader::parseOrganiationAndApp(QString line)
     }
 }
 
-void FileReader::parseMeasurementType(QString line)
+void FileReader::parseMeasurementType(const QString& line)
 {
     measurement_.header.measurement_type = line.simplified();
 }
 
-void FileReader::parseStartTime(QString line)
+void FileReader::parseStartTime(const QString& line)
 {
     static const QString time_format = "ddd MMM dd hh:mm:ss yyyy";
     static const QLocale locale {"en_US"};
@@ -137,25 +118,16 @@ void FileReader::parseParameters(const QStringList &header_lines, int first_para
 
 void FileReader::readData(QTextStream &input)
 {
+    int thread_count = 0;
     QString text = input.readAll();
     if (text.size() < multithreading_text_size) {
-        workers_[0]->setReadParameters(0, text.size());
-        threads_[0]->start();
-        for (size_t i = 1; i < threads_.size(); ++i) {
-            workers_[i]->setReadParameters(0, 0);
-        }
+        thread_count = 1;
     } else {
-        int size_per_thread = text.size() / threads_.size();
-        int begin = 0;
-        for (size_t i = 0; i < threads_.size(); ++i) {
-            int end_of_line = text.indexOf('\n', size_per_thread * (i + 1));
-            if (end_of_line == -1) {
-                end_of_line = text.size();
-            }
-            workers_[i]->setReadParameters(begin, end_of_line);
-            begin = end_of_line + 1;
-        }
+        thread_count = QThread::idealThreadCount();
     }
+
+    prepareThreadsAndWorkers(thread_count);
+    prepareWorkersData(text);
 
     emit readingStarted(text);
 }
@@ -200,21 +172,44 @@ void FileReader::concatenateWorkersResults()
     }
 }
 
-void FileReader::printHeader() const
+void FileReader::prepareThreadsAndWorkers(int thread_count)
 {
-    const auto& header = measurement_.header;
-    DEB << "Organization:" << header.organization;
-    DEB << "Application:" << header.application;
-    DEB << "Measurement type:" << header.measurement_type;
-    DEB << "Start time:" << header.start_time;
-    for (const auto& str : header.parameters) {
-        DEB << str;
+    threads_.clear();
+    quitThreads();
+    workers_.clear();
+    threads_.reserve(thread_count);
+    workers_.reserve(thread_count);
+    for (int i = 0; i < thread_count; ++i) {
+        threads_.push_back(std::make_unique<QThread>());
+        workers_.push_back(std::make_unique<DataParseWorker>());
+        connect(workers_[i].get(), &DataParseWorker::finished, this, &FileReader::onWorkerFinished);
+        connect(this, &FileReader::readingStarted, workers_[i].get(), &DataParseWorker::parse);
+        workers_[i]->moveToThread(threads_[i].get());
+    }
+    connect(workers_[0].get(), &DataParseWorker::progressChanged, this, &FileReader::progressChanged);
+
+    for (auto& thread : threads_) {
+        thread->start();
+    }
+}
+
+void FileReader::prepareWorkersData(const QString& text)
+{
+    int size_per_thread = text.size() / threads_.size();
+    int begin = 0;
+    for (size_t i = 0; i < threads_.size(); ++i) {
+        int end_of_line = text.indexOf('\n', size_per_thread * (i + 1));
+        if (end_of_line == -1) {
+            end_of_line = text.size();
+        }
+        workers_[i]->setReadParameters(begin, end_of_line);
+        begin = end_of_line + 1;
     }
 }
 
 void FileReader::onWorkerFinished()
 {
-    auto* worker = qobject_cast<DataReadWorker*>(sender());
+    auto* worker = qobject_cast<DataParseWorker*>(sender());
     if (worker) {
         workers_data_.push_back(worker->takeData());
         workers_stats_.push_back(worker->takeStats());

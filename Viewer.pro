@@ -9,7 +9,7 @@ CONFIG += c++2a
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    data_read_worker.cpp \
+    data_parse_worker.cpp \
     file_info_widget.cpp \
     file_reader.cpp \
     main.cpp \
@@ -22,7 +22,7 @@ SOURCES += \
     ruler_widget.cpp
 
 HEADERS += \
-    data_read_worker.hpp \
+    data_parse_worker.hpp \
     data_stats.hpp \
     file_info_widget.hpp \
     file_reader.hpp \

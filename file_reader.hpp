@@ -2,7 +2,7 @@
 #define FILEREADER_HPP
 
 #include "measurement.hpp"
-#include "data_read_worker.hpp"
+#include "data_parse_worker.hpp"
 
 #include <QObject>
 #include <QString>
@@ -10,8 +10,10 @@
 
 #include <memory>
 
+QT_BEGIN_NAMESPACE
 class QFile;
 class QTextStream;
+QT_END_NAMESPACE
 
 class FileReader : public QObject
 {
@@ -42,23 +44,24 @@ private:
     QStringList readHeaderLines(QTextStream& input) const;
     QStringList parseHeaderLines(const QStringList& lines);
     bool isHeaderLine(const QString& line) const;
-    void parseOrganiationAndApp(QString line);
-    void parseMeasurementType(QString line);
-    void parseStartTime(QString line);
+    void parseOrganiationAndApp(const QString& line);
+    void parseMeasurementType(const QString& line);
+    void parseStartTime(const QString& line);
     void parseParameters(const QStringList& header_lines, int first_parameters_line);
     void readData(QTextStream& input);
     void clear();
     void quitThreads() const;
     void concatenateWorkersResults();
     void setupThreads(const QString& text_for_parsing);
-    void printHeader() const;
+    void prepareThreadsAndWorkers(int thread_count);
+    void prepareWorkersData(const QString& text);
 
 private slots:
     void onWorkerFinished();
 
 private:
     std::vector<std::unique_ptr<QThread>> threads_;
-    std::vector<std::unique_ptr<DataReadWorker>> workers_;
+    std::vector<std::unique_ptr<DataParseWorker>> workers_;
     Measurement measurement_;
     QStringList header_errors_;
     QStringList data_errors_;

@@ -1,9 +1,6 @@
-#include "data_read_worker.hpp"
+#include "data_parse_worker.hpp"
 
-DataReadWorker::DataReadWorker()
-{}
-
-void DataReadWorker::read(const QString &text)
+void DataParseWorker::parse(const QString &text)
 {
     stats_ = {};
     if (begin_ == end_) {
@@ -39,23 +36,23 @@ void DataReadWorker::read(const QString &text)
     emit finished();
 }
 
-void DataReadWorker::setReadParameters(int begin, int end)
+void DataParseWorker::setReadParameters(int begin, int end)
 {
     begin_ = begin;
     end_ = end;
 }
 
-std::vector<QPointF> DataReadWorker::takeData()
+std::vector<QPointF> DataParseWorker::takeData()
 {
     return std::move(data_);
 }
 
-DataStats DataReadWorker::takeStats()
+DataStats DataParseWorker::takeStats()
 {
     return std::move(stats_);
 }
 
-void DataReadWorker::updateDataStats(const QPointF &new_value)
+void DataParseWorker::updateDataStats(const QPointF &new_value)
 {
     stats_.min_x = std::min(stats_.min_x, new_value.x());
     stats_.max_x = std::max(stats_.max_x, new_value.x());
