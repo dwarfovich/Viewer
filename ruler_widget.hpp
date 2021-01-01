@@ -24,6 +24,9 @@ protected:
     virtual void paintHorizontalRuler();
 
 private:
+    QString tickText(qreal value) const;
+
+private:
     Qt::Orientation orientation_ = {};
     qreal min_value_ = 0.;
     qreal max_value_ = 0.;

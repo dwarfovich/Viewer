@@ -1,10 +1,5 @@
 #include "data_read_worker.hpp"
 
-#include <QTime>
-
-#include <QDebug>
-#define DEB qDebug()
-
 DataReadWorker::DataReadWorker()
 {}
 
@@ -15,8 +10,7 @@ void DataReadWorker::read(const QString &text)
         emit finished();
         return;
     }
-    QTime timer;
-    timer.start();
+
     data_.reserve(reserved_data_size_);
     int progress_step = 0;
     for (int first = begin_; first < end_;) {
@@ -41,10 +35,6 @@ void DataReadWorker::read(const QString &text)
         }
         first = end_of_line + 1;
     }
-
-    qreal secs = timer.elapsed() / qreal(1000);
-//    DEB << "Parsing time: " << secs;
-//    DEB << "Data size:" << data_.size();
 
     emit finished();
 }

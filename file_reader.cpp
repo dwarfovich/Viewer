@@ -137,9 +137,6 @@ void FileReader::parseParameters(const QStringList &header_lines, int first_para
 
 void FileReader::readData(QTextStream &input)
 {
-    workers_data_.clear();
-    workers_stats_.clear();
-    jobs_done_ = 0;
     QString text = input.readAll();
     if (text.size() < multithreading_text_size) {
         workers_[0]->setReadParameters(0, text.size());
@@ -170,13 +167,15 @@ void FileReader::clear()
     measurement_.stats = {};
     header_errors_.clear();
     data_errors_.clear();
+    workers_data_.clear();
+    workers_stats_.clear();
+    jobs_done_ = 0;
 }
 
 void FileReader::quitThreads() const
 {
     for (auto& thread : threads_) {
         thread->quit();
-        thread->wait();
     }
 }
 
@@ -226,7 +225,6 @@ void FileReader::onWorkerFinished()
     ++jobs_done_;
     if (jobs_done_ == workers_.size()) {
         concatenateWorkersResults();
-//        DEB << "Result data size:" << measurement_.data.size();
         emit finished();
     }
 }

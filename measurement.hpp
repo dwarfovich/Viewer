@@ -8,8 +8,7 @@
 
 #include <vector>
 
-struct Measurement
-{
+struct Measurement {
     Header header;
     std::vector<QPointF> data;
     DataStats stats;

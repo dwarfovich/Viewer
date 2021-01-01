@@ -10,13 +10,10 @@ CONFIG += c++2a
 
 SOURCES += \
     data_read_worker.cpp \
-    data_stats.cpp \
     file_info_widget.cpp \
     file_reader.cpp \
-    header.cpp \
     main.cpp \
     main_window.cpp \
-    measurement.cpp \
     plot_drawer.cpp \
     plot_widget.cpp \
     preview_plot_frame_item.cpp \

@@ -51,12 +51,7 @@ void RulerWidget::paintVerticalRuler()
                 qreal y_range = max_value_ - min_value_;
                 qreal delta = y_range / ticks;
                 qreal tick = delta * i + min_value_;
-                QString text;
-                if (tick == 0) {
-                    text = QString::number(0, 'f', 1);
-                } else {
-                    text = QString::number(tick, 'e', 3);
-                }
+                QString text = tickText(tick);
                 const auto& metrics = painter.fontMetrics();;
                 int text_width = metrics.width(text);
                 qreal text_x = width() - parameters_y.tick_long_length - text_width - parameters_y.tick_text_offset_x;
@@ -84,17 +79,20 @@ void RulerWidget::paintHorizontalRuler()
             qreal x_range = max_value_ - min_value_;
             qreal delta = x_range / ticks;
             qreal tick = delta * i + min_value_;
-            QString text;
-            if (tick == 0) {
-                text = QString::number(0, 'f', 1);
-            } else {
-                text = QString::number(tick, 'e', 3);
-            }
+            QString text = tickText(tick);
             painter.drawText(0, 0, text);
-            painter.rotate(-45.);
             painter.restore();
         } else {
             painter.drawLine(x, 0, x, parameters_x.tick_short_length);
         }
+    }
+}
+
+QString RulerWidget::tickText(qreal value) const
+{
+    if (value == 0) {
+        return QString::number(0, 'f', 1);
+    } else {
+        return QString::number(value, 'e', 3);
     }
 }

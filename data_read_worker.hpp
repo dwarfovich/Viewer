@@ -31,7 +31,7 @@ private:
     int begin_ = 0;
     int end_ = 0;
     size_t reserved_data_size_ = 5'000'000;
-    const int steps_per_progress_ = 100'000;
+    const int steps_per_progress_ = 20'000;
 };
 
 #endif // DATAREADWORKER_HPP
