@@ -148,6 +148,7 @@ void FileReader::quitThreads() const
 {
     for (auto& thread : threads_) {
         thread->quit();
+        thread->wait();
     }
 }
 
@@ -212,14 +213,14 @@ void FileReader::onWorkerFinished()
     if (worker) {
         workers_data_.push_back(worker->takeData());
         workers_stats_.push_back(worker->takeStats());
+        ++jobs_done_;
+        if (jobs_done_ == workers_.size()) {
+            quitThreads();
+            concatenateWorkersResults();
+            emit finished();
+        }
     } else {
         Q_ASSERT(false);
-    }
-
-    ++jobs_done_;
-    if (jobs_done_ == workers_.size()) {
-        concatenateWorkersResults();
-        emit finished();
     }
 }
 

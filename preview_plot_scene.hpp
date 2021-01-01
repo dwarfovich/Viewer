@@ -44,7 +44,7 @@ private:
     qreal width_delta_ = 50.;
     qreal min_frame_width_ = 0.;
     qreal max_frame_width_ = 0.;
-    const size_t min_frame_points_ = 100;
+    const size_t min_frame_points_ = 50;
     const size_t max_frame_points_ = 100'000;
 };
 
