@@ -50,7 +50,7 @@ void RulerWidget::paintVerticalRuler()
             if (i != 0) {
                 qreal y_range = max_value_ - min_value_;
                 qreal delta = y_range / ticks;
-                qreal tick = delta * i + min_value_;
+                qreal tick = delta * (ticks - i) + min_value_;
                 QString text = tickText(tick);
                 const auto& metrics = painter.fontMetrics();;
                 int text_width = metrics.width(text);
