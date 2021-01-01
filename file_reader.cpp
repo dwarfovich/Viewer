@@ -110,7 +110,7 @@ void FileReader::parseStartTime(const QString& line)
 void FileReader::parseParameters(const QStringList &header_lines, int first_parameters_line)
 {
     std::vector<QString> parameters;
-    for (size_t i = first_parameters_line; i < header_lines.size(); ++i) {
+    for (int i = first_parameters_line; i < header_lines.size(); ++i) {
         parameters.push_back(header_lines[i]);
     }
     measurement_.header.parameters = parameters;
@@ -195,10 +195,10 @@ void FileReader::prepareThreadsAndWorkers(int thread_count)
 
 void FileReader::prepareWorkersData(const QString& text)
 {
-    int size_per_thread = text.size() / threads_.size();
+    int size_per_thread = text.size() / int(threads_.size());
     int begin = 0;
     for (size_t i = 0; i < threads_.size(); ++i) {
-        int end_of_line = text.indexOf('\n', size_per_thread * (i + 1));
+        int end_of_line = text.indexOf('\n', size_per_thread * (int(i) + 1));
         if (end_of_line == -1) {
             end_of_line = text.size();
         }

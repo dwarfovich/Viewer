@@ -3,9 +3,6 @@
 #include <QPainter>
 #include <QPen>
 
-#include <QDebug>
-#define DEB qDebug()
-
 RulerWidget::RulerWidget(QWidget* parent)
     : QWidget{parent}
 {
@@ -31,6 +28,8 @@ void RulerWidget::setOrientation(const Qt::Orientation& orientation)
 
 void RulerWidget::paintEvent(QPaintEvent* event)
 {
+    Q_UNUSED(event);
+
     if (orientation_ == Qt::Vertical) {
         paintVerticalRuler();
     } else {

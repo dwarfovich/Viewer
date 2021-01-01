@@ -3,9 +3,6 @@
 #include <QResizeEvent>
 #include <QGraphicsScene>
 
-#include <QDebug>
-#define DEB qDebug()
-
 PreviewPlotView::PreviewPlotView(QWidget *parent)
     : QGraphicsView{parent}
 {}

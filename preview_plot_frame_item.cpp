@@ -4,9 +4,6 @@
 #include <QBrush>
 #include <QGraphicsScene>
 
-#include <QDebug>
-#define DEB qDebug()
-
 PreviewPlotFrameItem::PreviewPlotFrameItem(QGraphicsItem *parent)
     : QGraphicsObject{parent}
 {
@@ -30,6 +27,9 @@ QRectF PreviewPlotFrameItem::boundingRect() const
 
 void PreviewPlotFrameItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
     painter->fillRect(0, 0, width_, height_, brush_);
 }
 

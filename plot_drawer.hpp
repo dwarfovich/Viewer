@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <QPixmap>
-#include <QRectF>
 #include <QPen>
 
 struct Measurement;

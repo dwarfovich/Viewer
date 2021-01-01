@@ -1,14 +1,9 @@
 #ifndef PLOTWIDGET_HPP
 #define PLOTWIDGET_HPP
 
-#include "plot_drawer.hpp"
-
 #include <QWidget>
 
-#include <QVBoxLayout>
-#include <QScrollArea>
-
-#include "measurement.hpp"
+class PlotDrawer;
 
 class PlotWidget : public QWidget
 {
@@ -17,7 +12,7 @@ class PlotWidget : public QWidget
 public:
     PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
-    void drawArea(int first_point, int last_point);
+    void drawArea(size_t first_point, size_t last_point);
 
 signals:
     void scaleChangeRequest(qreal angle_delta);

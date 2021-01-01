@@ -36,8 +36,8 @@ private:
     int showReadingErrorsMessage(const FileReader& reader) const;
 
 private slots:
-    void onPreviewViewSizeChanged(const QSize& size);
-    void onFrameItemChanged(const QRectF& rect);
+    void onPreviewViewSizeChanged();
+    void onFrameItemChanged();
     void onDataReadFinished();
     void onPlotWidgetPointChanged(size_t point, const QPointF& value);
 

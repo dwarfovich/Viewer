@@ -15,9 +15,6 @@
 #include <QTimer>
 #include <QMessageBox>
 
-#include <QDebug>
-#define DEB qDebug()
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , ui_{new Ui::MainWindow}
@@ -161,14 +158,14 @@ int MainWindow::showReadingErrorsMessage(const FileReader &reader) const
     return reply;
 }
 
-void MainWindow::onPreviewViewSizeChanged(const QSize& size)
+void MainWindow::onPreviewViewSizeChanged()
 {
     if (measurement_.data.size() > 0){
         updatePlot();
     }
 }
 
-void MainWindow::onFrameItemChanged(const QRectF& rect)
+void MainWindow::onFrameItemChanged()
 {
     updatePlot();
 }

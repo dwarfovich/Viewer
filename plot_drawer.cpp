@@ -3,9 +3,6 @@
 
 #include <QPainter>
 
-#include <QDebug>
-#define DEB qDebug()
-
 PlotDrawer::PlotDrawer(const Measurement *measurement)
     : measurement_{measurement}
 {}

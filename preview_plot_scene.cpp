@@ -6,9 +6,6 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
 
-#include <QDebug>
-#define DEB qDebug()
-
 PreviewPlotScene::PreviewPlotScene(PlotDrawer &drawer, QObject* parent)
     : QGraphicsScene{parent}
     , drawer_{drawer}

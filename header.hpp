@@ -4,8 +4,6 @@
 #include <QString>
 #include <QDateTime>
 
-class QTextStream;
-
 struct Header
 {
     QString filename;
