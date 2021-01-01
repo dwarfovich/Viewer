@@ -129,7 +129,7 @@ void FileReader::readData(QTextStream &input)
     prepareThreadsAndWorkers(thread_count);
     prepareWorkersData(text);
 
-    emit readingStarted(text);
+    emit parsingStarted(text);
 }
 
 void FileReader::clear()
@@ -153,7 +153,6 @@ void FileReader::quitThreads() const
 
 void FileReader::concatenateWorkersResults()
 {
-    // TODO: Check for movement.
     std::sort(workers_data_.begin(), workers_data_.end(), [](const auto& v1, const auto& v2) {
         if (v1.empty() || v2.empty()) {
             return false;
@@ -183,7 +182,7 @@ void FileReader::prepareThreadsAndWorkers(int thread_count)
         threads_.push_back(std::make_unique<QThread>());
         workers_.push_back(std::make_unique<DataParseWorker>());
         connect(workers_[i].get(), &DataParseWorker::finished, this, &FileReader::onWorkerFinished);
-        connect(this, &FileReader::readingStarted, workers_[i].get(), &DataParseWorker::parse);
+        connect(this, &FileReader::parsingStarted, workers_[i].get(), &DataParseWorker::parse);
         workers_[i]->moveToThread(threads_[i].get());
     }
     connect(workers_[0].get(), &DataParseWorker::progressChanged, this, &FileReader::progressChanged);

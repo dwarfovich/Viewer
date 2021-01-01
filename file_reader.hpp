@@ -38,7 +38,7 @@ public:
 signals:
     void progressChanged(qreal progress);
     void finished();
-    void readingStarted(const QString& text);
+    void parsingStarted(const QString& text);
 
 private:
     QStringList readHeaderLines(QTextStream& input) const;
