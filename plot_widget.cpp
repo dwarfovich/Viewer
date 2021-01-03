@@ -9,6 +9,9 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 
+#include <QDebug>
+#define DEB qDebug()
+
 PlotWidget::PlotWidget(PlotDrawer &drawer, QWidget *parent)
     : QWidget{parent}
     , drawer_{drawer}
@@ -25,9 +28,16 @@ void PlotWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(QPoint{0, 0}, plot_);
 }
 
-void PlotWidget::drawArea(size_t first_point, size_t last_point, const PreviewPlotFrameItem& frame_item)
+void PlotWidget::drawArea(const PreviewPlotFrameItem& frame_item)
 {
-    drawer_.drawMainPlot(first_point, last_point, width(), height(), frame_item);
+    qreal first_scene_x = frame_item.firstSceneX();
+    qreal last_scene_x = frame_item.lastSceneX();
+    const auto& measurement = *drawer_.measurement();
+    qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
+    qreal first_x = (x_range * first_scene_x) / 100. + measurement.stats.min_x;
+    qreal last_x = (x_range * last_scene_x) / 100. + measurement.stats.min_x;
+    auto [first_index, last_index] = indicesOfPoints(first_x, last_x);
+    drawer_.drawMainPlot(first_index, last_index, width(), height(), frame_item);
     plot_ = drawer_.plot();
     update();
     emit horizontalRangeChanged(drawer_.rangeX());
@@ -50,4 +60,46 @@ void PlotWidget::mouseMoveEvent(QMouseEvent* event)
     if (current_point < data.size()) {
         emit selectedPointChanged(current_point, data[current_point]);
     }
+}
+
+std::pair<size_t, size_t> PlotWidget::indicesOfPoints(qreal first_x, qreal last_x) const
+{
+    const auto& measurement = *drawer_.measurement();
+
+    struct QPointFComparator
+    {
+        bool operator() (const QPointF& left, const QPointF& right) {
+            return left.x() < right.x();
+        }
+        bool operator() (const QPointF& left, qreal right) {
+            return left.x() < right;
+        }
+        bool operator() (qreal left, const QPointF& right) {
+            return left < right.x();
+        }
+    };
+
+    const auto& data = measurement.data;
+    auto first_iter = std::lower_bound(data.cbegin(), data.cend(), first_x, QPointFComparator());
+    if (first_iter == data.cend()) {
+        first_iter = data.cend() - 1;
+    }
+    auto last_iter = std::lower_bound(data.cbegin(), data.cend(), last_x, QPointFComparator());
+    if (last_iter == data.cend()) {
+        last_iter = data.cend() - 1;
+    }
+    size_t first_point = std::distance(data.cbegin(), first_iter);
+    size_t last_point = std::distance(data.cbegin(), last_iter);
+
+    if (last_point == 0) {
+        last_point = measurement.data.size() - 1;
+    }
+    if (first_point == last_point && first_point != 0) {
+        --first_point;
+        if (last_point < measurement.data.size() - 1) {
+            ++last_point;
+        }
+    }
+
+    return {first_point, last_point};
 }

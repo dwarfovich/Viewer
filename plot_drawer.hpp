@@ -14,8 +14,8 @@ class PlotDrawer: public QObject
 
     struct PlotParameters {
         QPixmap& pixmap;
-        int width = 0;
-        int height = 0;
+        int area_width = 0;
+        int area_height = 0;
         size_t rarefaction = 0;
         size_t first_point = 0;
         size_t last_point = 0;

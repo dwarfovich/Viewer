@@ -101,41 +101,7 @@ void MainWindow::updatePlot()
 {
     auto* frame_item = preview_scene_->frameItem();
     Q_ASSERT(frame_item);
-    qreal preview_width = preview_scene_->width();
-    qreal first = (frame_item->x() * 100.) / preview_width;
-    qreal last = ((frame_item->x() + frame_item->width()) * 100.) / preview_width;
-    qreal x_range = measurement_.stats.max_x - measurement_.stats.min_x;
-    qreal first_x = (x_range * first) / 100. + measurement_.stats.min_x;
-    qreal last_x = (x_range * last) / 100. + measurement_.stats.min_x;
-    bool first_found = false;
-    size_t first_point = 0;
-    size_t last_point = 0;
-    for (size_t i = 0; i < measurement_.data.size(); ++i) {
-        if (!first_found && measurement_.data[i].x() >= first_x) {
-//            first_point = std::min<size_t>(i - 1, 0);
-            if (i == 0) {
-                first_point = 0;
-            } else {
-                first_point = i - 1;
-            }
-//            first_point = i;
-            first_found = true;
-        }
-        if (measurement_.data[i].x() >= last_x) {
-            last_point = i;
-            break;
-        }
-    }
-    if (last_point == 0) {
-        last_point = measurement_.data.size() - 1;
-    }
-    if (first_point == last_point && first_point != 0) {
-        --first_point;
-        if (last_point < measurement_.data.size() - 1) {
-            ++last_point;
-        }
-    }
-    plot_widget_->drawArea(first_point, last_point, *frame_item);
+    plot_widget_->drawArea(*frame_item);
 }
 
 void MainWindow::showFileInfo()

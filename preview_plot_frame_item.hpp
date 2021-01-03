@@ -16,6 +16,8 @@ public:
     int type() const override;
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    qreal firstSceneX() const;
+    qreal lastSceneX() const;
     int width() const;
     void setWidth(int width);
     int height() const;

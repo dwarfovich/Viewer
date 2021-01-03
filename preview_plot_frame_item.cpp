@@ -33,6 +33,22 @@ void PreviewPlotFrameItem::paint(QPainter *painter, const QStyleOptionGraphicsIt
     painter->fillRect(0, 0, width_, height_, brush_);
 }
 
+qreal PreviewPlotFrameItem::firstSceneX() const
+{
+    qreal preview_width = scene()->width();
+    qreal first_scene_x = (x() * 100.) / preview_width;
+
+    return first_scene_x;
+}
+
+qreal PreviewPlotFrameItem::lastSceneX() const
+{
+    qreal preview_width = scene()->width();
+    qreal last_scene_x = ((x() + width()) * 100.) / preview_width;
+
+    return last_scene_x;
+}
+
 int PreviewPlotFrameItem::width() const
 {
     return width_;

@@ -13,7 +13,7 @@ class PlotWidget : public QWidget
 public:
     PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
-    void drawArea(size_t first_point, size_t last_point, const PreviewPlotFrameItem& frame_item);
+    void drawArea(const PreviewPlotFrameItem& frame_item);
 
 signals:
     void scaleChangeRequest(qreal angle_delta);
@@ -25,6 +25,9 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
+
+private:
+    std::pair<size_t, size_t> indicesOfPoints(qreal first_x, qreal last_x) const;
 
 private:
     PlotDrawer& drawer_;
