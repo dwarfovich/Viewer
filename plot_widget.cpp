@@ -9,9 +9,6 @@
 #include <QWheelEvent>
 #include <QMouseEvent>
 
-#include <QDebug>
-#define DEB qDebug()
-
 PlotWidget::PlotWidget(PlotDrawer &drawer, QWidget *parent)
     : QWidget{parent}
     , drawer_{drawer}
@@ -36,7 +33,7 @@ void PlotWidget::drawArea(const PreviewPlotFrameItem& frame_item)
     qreal x_range = measurement.stats.max_x - measurement.stats.min_x;
     qreal first_x = (x_range * first_scene_x) / 100. + measurement.stats.min_x;
     qreal last_x = (x_range * last_scene_x) / 100. + measurement.stats.min_x;
-    auto [first_index, last_index] = indicesOfPoints(first_x, last_x);
+    const auto& [first_index, last_index] = indicesOfPoints(first_x, last_x);
     drawer_.drawMainPlot(first_index, last_index, width(), height(), frame_item);
     plot_ = drawer_.plot();
     update();
