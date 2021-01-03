@@ -44,8 +44,10 @@ private:
     qreal width_delta_ = 25.;
     qreal min_frame_width_ = 0.;
     qreal max_frame_width_ = 0.;
+    const qreal min_frame_percent_ = 10.;
+    const qreal max_frame_percent_ = 10;
     const size_t min_frame_points_ = 50;
-    const size_t max_frame_points_ = 100'000;
+    const size_t max_frame_points_ = 5000000;
 };
 
 #endif // PREVIEWPLOTSCENE_HPP

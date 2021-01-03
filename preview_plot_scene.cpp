@@ -39,9 +39,7 @@ void PreviewPlotScene::resetFrameItem(int height, int expected_scene_width)
 
     min_frame_width_ = minFrameWidth(expected_scene_width);
     max_frame_width_ = maxFrameWidth(expected_scene_width);
-    DEB << min_frame_width_ << max_frame_width_;
     normal_width_ = (max_frame_width_ + min_frame_width_) / 2.;
-
     frame_item_->setWidth(normal_width_);
     frame_item_->setX(0);
 }
@@ -66,18 +64,14 @@ void PreviewPlotScene::onPlotScaleRequest(qreal angle_delta)
 qreal PreviewPlotScene::minFrameWidth(int expected_scene_width) const
 {
     const auto& data = drawer_.measurement()->data;
-    size_t first_point = std::min(min_frame_points_, data.size() - 1);
-    qreal min_width = expected_scene_width * xPercentAtPoint(first_point) / 100.;
-
+    qreal min_width = std::max(min_frame_points_ * 100. / data.size(), 1.);
     return min_width;
 }
 
 qreal PreviewPlotScene::maxFrameWidth(int expected_scene_width) const
 {
     const auto& data = drawer_.measurement()->data;
-    size_t last_point = std::min(max_frame_points_, data.size() - 1);
-    qreal max_width = expected_scene_width * xPercentAtPoint(last_point) / 100.;
-
+    qreal max_width = max_frame_points_ * 100. / data.size();
     return max_width;
 }
 

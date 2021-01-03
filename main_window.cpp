@@ -15,6 +15,9 @@
 #include <QTimer>
 #include <QMessageBox>
 
+#include <QDebug>
+#define DEB qDebug()
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow{parent}
     , ui_{new Ui::MainWindow}
@@ -90,6 +93,7 @@ void MainWindow::onPreviewFrameItemPosChanged()
 
 void MainWindow::updatePreviewPlot()
 {
+//    DEB << ui_->previewPlotView->width() << ui_->previewPlotView->height();
     preview_scene_->updatePreview(ui_->previewPlotView->width(), ui_->previewPlotView->height());
 }
 
@@ -190,8 +194,8 @@ void MainWindow::onDataReadFinished()
     measurement_ = file_reader_.takeMeasurement();
     Q_ASSERT(!measurement_.data.empty());
 
-    preview_scene_->resetFrameItem(ui_->previewPlotView->height(), ui_->previewPlotView->width());
     updatePreviewPlot();
+    preview_scene_->resetFrameItem(ui_->previewPlotView->height(), ui_->previewPlotView->width());
     updatePlot();
 }
 
