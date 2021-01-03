@@ -41,7 +41,7 @@ private:
     QGraphicsPixmapItem* preview_item_;
     PreviewPlotFrameItem* frame_item_;
     qreal normal_width_ = 50.;
-    qreal width_delta_ = 50.;
+    qreal width_delta_ = 25.;
     qreal min_frame_width_ = 0.;
     qreal max_frame_width_ = 0.;
     const size_t min_frame_points_ = 50;

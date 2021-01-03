@@ -6,6 +6,9 @@
 #include <QGraphicsPixmapItem>
 #include <QGraphicsSceneMouseEvent>
 
+#include <QDebug>
+#define DEB qDebug()
+
 PreviewPlotScene::PreviewPlotScene(PlotDrawer &drawer, QObject* parent)
     : QGraphicsScene{parent}
     , drawer_{drawer}
@@ -36,6 +39,7 @@ void PreviewPlotScene::resetFrameItem(int height, int expected_scene_width)
 
     min_frame_width_ = minFrameWidth(expected_scene_width);
     max_frame_width_ = maxFrameWidth(expected_scene_width);
+    DEB << min_frame_width_ << max_frame_width_;
     normal_width_ = (max_frame_width_ + min_frame_width_) / 2.;
 
     frame_item_->setWidth(normal_width_);
