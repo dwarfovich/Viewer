@@ -29,7 +29,7 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
     const auto x_coefficient = parameters.width / delta_x;
     const auto y_coefficient = parameters.height / delta_y;
 
-    size_t last_point = 0;
+    size_t last_point_painted = 0;
     for (size_t i = first_point + rarefaction; i <= last_point; i += rarefaction) {
         QPointF point1;
         if (i - rarefaction == first_point) {
@@ -51,10 +51,10 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
 
         painter.drawLine(point1, point2);
 
-        last_point = i;
+        last_point_painted = i;
     }
 
-    if (last_point != last_point) {
+    if (last_point_painted != last_point) {
         QPointF point1;
         point1.setX(x_coefficient * (data[last_point - rarefaction].x() - parameters.min_values.x()));
         point1.setY(parameters.height - (y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y())));
