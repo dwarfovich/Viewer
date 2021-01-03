@@ -4,6 +4,7 @@
 #include <QWidget>
 
 class PlotDrawer;
+class PreviewPlotFrameItem;
 
 class PlotWidget : public QWidget
 {
@@ -12,7 +13,7 @@ class PlotWidget : public QWidget
 public:
     PlotWidget(PlotDrawer &drawer, QWidget* parent = nullptr);
 
-    void drawArea(size_t first_point, size_t last_point);
+    void drawArea(size_t first_point, size_t last_point, const PreviewPlotFrameItem& frame_item);
 
 signals:
     void scaleChangeRequest(qreal angle_delta);

@@ -1,6 +1,7 @@
 #include "plot_widget.hpp"
 #include "measurement.hpp"
 #include "plot_drawer.hpp"
+#include "preview_plot_frame_item.hpp"
 
 #include <QPainter>
 #include <QHBoxLayout>
@@ -24,9 +25,9 @@ void PlotWidget::paintEvent(QPaintEvent *event)
     painter.drawPixmap(QPoint{0, 0}, plot_);
 }
 
-void PlotWidget::drawArea(size_t first_point, size_t last_point)
+void PlotWidget::drawArea(size_t first_point, size_t last_point, const PreviewPlotFrameItem& frame_item)
 {
-    drawer_.drawMainPlot(first_point, last_point, width(), height());
+    drawer_.drawMainPlot(first_point, last_point, width(), height(), frame_item);
     plot_ = drawer_.plot();
     update();
     emit horizontalRangeChanged(drawer_.rangeX());

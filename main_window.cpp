@@ -77,6 +77,7 @@ MainWindow::~MainWindow()
 void MainWindow::loadFile()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Select file"), "C:/Boo/Code/Viewer/SampleFiles");
+//    QString filename = "C:/Boo/Code/Viewer/SampleFiles/blocks.ssd";
     if (!filename.isEmpty()) {
         file_reader_.readFile(filename);
     }
@@ -107,7 +108,13 @@ void MainWindow::updatePlot()
     size_t last_point = 0;
     for (size_t i = 0; i < measurement_.data.size(); ++i) {
         if (!first_found && measurement_.data[i].x() >= first_x) {
-            first_point = i;
+//            first_point = std::min<size_t>(i - 1, 0);
+            if (i == 0) {
+                first_point = 0;
+            } else {
+                first_point = i - 1;
+            }
+//            first_point = i;
             first_found = true;
         }
         if (measurement_.data[i].x() >= last_x) {
@@ -124,7 +131,7 @@ void MainWindow::updatePlot()
             ++last_point;
         }
     }
-    plot_widget_->drawArea(first_point, last_point);
+    plot_widget_->drawArea(first_point, last_point, *frame_item);
 }
 
 void MainWindow::showFileInfo()

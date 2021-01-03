@@ -1,7 +1,12 @@
 #include "plot_drawer.hpp"
 #include "measurement.hpp"
+#include "preview_plot_frame_item.hpp"
 
+#include <QGraphicsScene>
 #include <QPainter>
+
+#include <QDebug>
+#define DEB qDebug()
 
 PlotDrawer::PlotDrawer(const Measurement *measurement)
     : measurement_{measurement}
@@ -49,6 +54,68 @@ void PlotDrawer::drawPlot(const PlotParameters& parameters)
     }
 }
 
+void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
+{
+    QPixmap& pixmap = parameters.pixmap;
+    pixmap = QPixmap{parameters.width, parameters.height};
+    QPainter painter {&pixmap};
+    pixmap.fill(parameters.background_color);
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(parameters.pen);
+
+    const auto& data = measurement_->data;
+    const auto& rarefaction = parameters.rarefaction;
+    const auto& first = parameters.first_point;
+    const auto& last = parameters.last_point;
+//    const auto& delta_x = parameters.max_values.x() - parameters.min_values.x();
+    const auto& delta_x = parameters.last_x - parameters.first_x;
+    auto delta_y = parameters.max_values.y() - parameters.min_values.y();
+    if (delta_y == 0) {
+//        DEB << first << last << data[first].y() << data[last].y();
+        delta_y = data[last].y() - data[first].y();
+    }
+    const auto& x_coefficient = parameters.width / delta_x;
+    const auto& y_coefficient = parameters.height / delta_y;
+
+    size_t last_point = 0;
+    for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
+        QPointF point1;
+        if (i - rarefaction == first) {
+            point1.setX(0);
+            point1.setY(parameters.height - (y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y())));
+        } else {
+            point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.first_x));
+            point1.setY(parameters.height - (y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y())));
+        }
+
+        QPointF point2;
+        if (i == last) {
+            point2.setX(x_coefficient * (parameters.last_x - parameters.first_x));
+            point2.setY(parameters.height - (y_coefficient * (data[i].y() - parameters.min_values.y())));
+        } else {
+            point2.setX(x_coefficient * (data[i].x() - parameters.first_x));
+            point2.setY(parameters.height - (y_coefficient * (data[i].y() - parameters.min_values.y())));
+        }
+//        if (first >= 96 && last == 97) {
+//            DEB << point1 << point2;
+//        }
+        painter.drawLine(point1, point2);
+
+        last_point = i;
+    }
+//    DEB << "-----------------";
+
+    if (last_point != last) {
+        QPointF point1;
+        point1.setX(x_coefficient * (data[last_point - rarefaction].x() - parameters.first_x));
+        point1.setY(parameters.height - (y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y())));
+        QPointF point2;
+        point2.setX(x_coefficient * (data[last].x() - parameters.first_x));
+        point2.setY(parameters.height - (y_coefficient * (data[last].y() - parameters.min_values.y())));
+        painter.drawLine(point1, point2);
+    }
+}
+
 void PlotDrawer::drawPreview(int width, int height)
 {
     PlotParameters parameters {plot_preview_};
@@ -65,7 +132,7 @@ void PlotDrawer::drawPreview(int width, int height)
     drawPlot(parameters);
 }
 
-void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, int height)
+void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, int height, const PreviewPlotFrameItem& item)
 {
     PlotParameters parameters {plot_};
     const auto& data = measurement_->data;
@@ -81,7 +148,18 @@ void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, 
     range_x = {data[first_point].x(), data[last_point].x()};
     range_y = {min_max_y.first->y(), min_max_y.second->y()};
     main_plot_points_range = {first_point, last_point};
-    drawPlot(parameters);
+
+    qreal preview_width = item.scene()->width();
+    qreal first_percent = (item.pos().x() * 100.) / preview_width;
+    const auto& stats = measurement_->stats;
+    qreal stats_range_x = stats.max_x - stats.min_x;
+    qreal first_x = stats_range_x * first_percent / 100. + stats.min_x;
+    parameters.first_x = first_x;
+    qreal last_percent = ((item.pos().x() + item.width()) * 100.) / preview_width;
+    qreal last_x = stats_range_x * last_percent / 100. + stats.min_x;
+    parameters.last_x = last_x;
+
+    drawPlotNew(parameters);
 }
 
 const QPixmap &PlotDrawer::plot() const

@@ -6,6 +6,7 @@
 #include <QPen>
 
 struct Measurement;
+class PreviewPlotFrameItem;
 
 class PlotDrawer: public QObject
 {
@@ -22,14 +23,17 @@ class PlotDrawer: public QObject
         QPointF max_values = {};
         QPen pen = {Qt::green};
         QColor background_color = Qt::black;
+        qreal first_x = 0.;
+        qreal last_x = 0.;
     };
 
 public:
     PlotDrawer(const Measurement* measurement = nullptr);
 
     void drawPlot(const PlotParameters& parameters);
+    void drawPlotNew(const PlotParameters& parameters);
     void drawPreview(int width, int height);
-    void drawMainPlot(size_t first_point, size_t last_point, int width, int height);
+    void drawMainPlot(size_t first_point, size_t last_point, int width, int height, const PreviewPlotFrameItem& item);
     const QPixmap& plot() const;
     const QPixmap& plotPreview() const;
     void setMeasurement(const Measurement *measurement);
@@ -50,6 +54,7 @@ private:
     std::pair<qreal, qreal> range_y = {0., 0.};
     std::pair<size_t, size_t> main_plot_points_range = {0, 0};
     const size_t size_without_rarefaction = 5'000;
+    const qreal dt_ = 1.;
 };
 
 #endif // PLOTDRAWER_HPP
