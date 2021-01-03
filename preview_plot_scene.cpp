@@ -63,6 +63,8 @@ void PreviewPlotScene::onPlotScaleRequest(qreal angle_delta)
 
 qreal PreviewPlotScene::minFrameWidth(int expected_scene_width) const
 {
+    Q_UNUSED(expected_scene_width);
+
     const auto& data = drawer_.measurement()->data;
     qreal min_width = std::max(min_frame_points_ * 100. / data.size(), 1.);
     return min_width;
@@ -71,7 +73,7 @@ qreal PreviewPlotScene::minFrameWidth(int expected_scene_width) const
 qreal PreviewPlotScene::maxFrameWidth(int expected_scene_width) const
 {
     const auto& data = drawer_.measurement()->data;
-    qreal max_width = max_frame_points_ * 100. / data.size();
+    qreal max_width = std::min<qreal>(max_frame_points_ * 100. / data.size(), expected_scene_width);
     return max_width;
 }
 
