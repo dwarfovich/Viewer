@@ -23,7 +23,7 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
     const auto first_point = parameters.first_point;
     const auto last_point = parameters.last_point;
     const auto delta_x = parameters.max_values.x() - parameters.min_values.x();
-    const auto delta_y = (parameters.max_values.y() - parameters.min_values.y()
+    const auto delta_y = (parameters.max_values.y() - parameters.min_values.y() != 0
             ? parameters.max_values.y() - parameters.min_values.y()
             : data[last_point].y() - data[first_point].y());
     const auto x_coefficient = parameters.width / delta_x;
@@ -33,7 +33,7 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
     for (size_t i = first_point + rarefaction; i <= last_point; i += rarefaction) {
         QPointF point1;
         if (i - rarefaction == first_point) {
-            point1.setX(0);
+            point1.setX(0.);
             point1.setY(parameters.height - (y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y())));
         } else {
             point1.setX(x_coefficient * (data[i - rarefaction].x() - parameters.min_values.x()));
