@@ -20,19 +20,19 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
 
     const auto data = measurement_->data;
     const auto rarefaction = parameters.rarefaction;
-    const auto first = parameters.first_point;
-    const auto last = parameters.last_point;
+    const auto first_point = parameters.first_point;
+    const auto last_point = parameters.last_point;
     const auto delta_x = parameters.max_values.x() - parameters.min_values.x();
     const auto delta_y = (parameters.max_values.y() - parameters.min_values.y()
             ? parameters.max_values.y() - parameters.min_values.y()
-            : data[last].y() - data[first].y());
+            : data[last_point].y() - data[first_point].y());
     const auto x_coefficient = parameters.width / delta_x;
     const auto y_coefficient = parameters.height / delta_y;
 
     size_t last_point = 0;
-    for (size_t i = first + rarefaction; i <= last; i += rarefaction) {
+    for (size_t i = first_point + rarefaction; i <= last_point; i += rarefaction) {
         QPointF point1;
-        if (i - rarefaction == first) {
+        if (i - rarefaction == first_point) {
             point1.setX(0);
             point1.setY(parameters.height - (y_coefficient * (data[i - rarefaction].y() - parameters.min_values.y())));
         } else {
@@ -41,7 +41,7 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
         }
 
         QPointF point2;
-        if (i == last) {
+        if (i == last_point) {
             point2.setX(x_coefficient * delta_x);
             point2.setY(parameters.height - (y_coefficient * (data[i].y() - parameters.min_values.y())));
         } else {
@@ -54,13 +54,13 @@ void PlotDrawer::drawPlotNew(const PlotParameters& parameters)
         last_point = i;
     }
 
-    if (last_point != last) {
+    if (last_point != last_point) {
         QPointF point1;
         point1.setX(x_coefficient * (data[last_point - rarefaction].x() - parameters.min_values.x()));
         point1.setY(parameters.height - (y_coefficient * (data[last_point - rarefaction].y() - parameters.min_values.y())));
         QPointF point2;
-        point2.setX(x_coefficient * (data[last].x() - parameters.min_values.x()));
-        point2.setY(parameters.height - (y_coefficient * (data[last].y() - parameters.min_values.y())));
+        point2.setX(x_coefficient * (data[last_point].x() - parameters.min_values.x()));
+        point2.setY(parameters.height - (y_coefficient * (data[last_point].y() - parameters.min_values.y())));
         painter.drawLine(point1, point2);
     }
 }
@@ -89,8 +89,6 @@ void PlotDrawer::drawMainPlot(size_t first_point, size_t last_point, int width, 
     parameters.width = width;
     parameters.height = height;
     parameters.rarefaction = calculateMainPlotRarefaction(last_point - first_point);
-
-
     main_plot_points_range = {first_point, last_point};
 
     qreal preview_width = item.scene()->width();
