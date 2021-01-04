@@ -92,6 +92,6 @@ QString RulerWidget::tickText(qreal value) const
     if (value == 0) {
         return QString::number(0, 'f', 1);
     } else {
-        return QString::number(value, 'e', 3);
+        return QString::number(value, 'e', 5);
     }
 }
