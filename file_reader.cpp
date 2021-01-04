@@ -24,6 +24,11 @@ void FileReader::readFile(const QString &filename)
         measurement_.header.filename = filename;
         QTextStream input {&file};
         const auto& header_lines = readHeaderLines(input);
+        if (header_lines.empty()) {
+            header_errors_.append(tr("No header."));
+        } else if (header_lines.size() < Parameters){
+            header_errors_.append(tr("Some header lines are missing"));
+        }
         const auto& header_errors = parseHeaderLines(header_lines);
         header_errors_.append(header_errors);
         readData(input);
