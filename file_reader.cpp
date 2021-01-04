@@ -5,7 +5,6 @@
 
 #include <QTextStream>
 #include <QFile>
-#include <QMessageBox>
 
 #include <algorithm>
 
@@ -83,6 +82,7 @@ void FileReader::parseOrganiationAndApp(const QString& line)
     int organization_delimiter_pos = line.indexOf(',');
     if (organization_delimiter_pos == -1){
         measurement_.header.organization = line;
+        header_errors_.append(tr("Cannot parse application name."));
     } else {
         measurement_.header.organization = line.left(organization_delimiter_pos);
         measurement_.header.application =
@@ -101,7 +101,7 @@ void FileReader::parseStartTime(const QString& line)
     static const QLocale locale {"en_US"};
     auto time = locale.toDateTime(line, time_format);
     if (!time.isValid()) {
-        header_errors_.push_back(tr("Cannot parse start time."));
+        header_errors_.append(tr("Cannot parse start time."));
     } else{
         measurement_.header.start_time = locale.toDateTime(line, time_format);
     }
@@ -170,6 +170,7 @@ void FileReader::concatenateWorkersResults()
         measurement_.stats.max_x = std::max(measurement_.stats.max_x, stats.max_x);
         measurement_.stats.max_y = std::max(measurement_.stats.max_y, stats.max_y);
     }
+
 }
 
 void FileReader::prepareThreadsAndWorkers(int thread_count)
@@ -213,6 +214,7 @@ void FileReader::onWorkerFinished()
     if (worker) {
         workers_data_.push_back(worker->takeData());
         workers_stats_.push_back(worker->takeStats());
+        data_errors_.append(worker->takeDataErrors());
         ++jobs_done_;
         if (jobs_done_ == workers_.size()) {
             quitThreads();

@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QPointF>
 
+#include <vector>
+
 class DataParseWorker : public QObject
 {
     Q_OBJECT
@@ -15,6 +17,7 @@ public:
     void setReadParameters(int begin, int end);
     std::vector<QPointF> takeData();
     DataStats takeStats();
+    QStringList takeDataErrors() const;
 
 signals:
     void progressChanged(qreal progress);
@@ -26,6 +29,7 @@ private:
 private:
     std::vector<QPointF> data_;
     DataStats stats_;
+    QStringList data_errors_;
     int begin_ = 0;
     int end_ = 0;
     size_t reserved_data_size_ = 2'000'000;
